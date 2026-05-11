@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+
+  /* Mapped to the app's dark palette */
+  --background: 222 77% 5%; /* #030712 */
+  --foreground: 145 100% 90%; /* #e5fff0 */
+  --card: 210 70% 8%; /* #07111f */
+  --card-foreground: 145 100% 90%;
+  --popover: 210 70% 8%;
+  --popover-foreground: 145 100% 90%;
+  --primary: 109 100% 54%; /* #39ff14 neon green */
+  --primary-foreground: 222 77% 5%;
+  --secondary: 211 65% 11%; /* #0b1729 */
+  --secondary-foreground: 145 100% 90%;
+  --muted: 211 65% 11%;
+  --muted-foreground: 205 17% 57%; /* #7d93a5 */
+  --accent: 141 44% 16%; /* #173826 */
+  --accent-foreground: 109 100% 54%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 207 60% 18%; /* #123047 */
+  --input: 207 60% 18%;
+  --ring: 109 100% 54%;
+  --radius: 0.625rem;
+}
+
+html,
+body,
+#root {
+  background-color: hsl(var(--background));
+}
