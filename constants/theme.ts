@@ -5,7 +5,7 @@
 
 import { Platform } from "react-native";
 
-const tintColor = "#39ff14";
+const tintColor = "#22C986";
 const backgroundColor = "#030712";
 const surfaceColor = "#07111f";
 const elevatedSurfaceColor = "#0b1729";

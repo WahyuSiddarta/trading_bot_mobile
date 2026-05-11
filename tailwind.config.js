@@ -55,7 +55,7 @@ module.exports = {
         surface: "#07111f",
         surfaceElevated: "#0b1729",
         accentSoft: "#173826",
-        neonGreen: "#39ff14",
+        neonGreen: "#22C986",
       },
       borderRadius: {
         lg: "var(--radius)",
