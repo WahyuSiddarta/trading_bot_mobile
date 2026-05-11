@@ -6,11 +6,9 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
+  Text,
   View,
 } from "react-native";
-
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 
 export default function HomeScreen() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -40,42 +38,42 @@ export default function HomeScreen() {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <ThemedView style={styles.heroCard}>
-          <ThemedText style={styles.eyebrow}>CONTROL SURFACE</ThemedText>
-          <ThemedText type="title" style={styles.title}>
+        <View style={styles.heroCard}>
+          <Text style={styles.eyebrow}>CONTROL SURFACE</Text>
+          <Text style={styles.title}>
             Local drawer for tools, filters, or custom actions.
-          </ThemedText>
-          <ThemedText style={styles.description}>
+          </Text>
+          <Text style={styles.description}>
             This drawer is just UI state. It does not change routes, so you can
             mount any component tree inside it.
-          </ThemedText>
+          </Text>
 
           <Pressable
             accessibilityRole="button"
             onPress={() => setIsDrawerOpen(true)}
             className="bg-primary rounded-full px-4 py-2"
           >
-            <ThemedText>Open Drawer 1r</ThemedText>
+            <Text>Open Drawer 1r</Text>
           </Pressable>
-        </ThemedView>
+        </View>
 
-        <ThemedView style={styles.panelRow}>
-          <ThemedView style={styles.infoCard}>
-            <ThemedText type="subtitle">Why this approach</ThemedText>
-            <ThemedText style={styles.cardText}>
+        <View style={styles.panelRow}>
+          <View style={styles.infoCard}>
+            <Text>Why this approach</Text>
+            <Text style={styles.cardText}>
               Use a drawer when you need a persistent side panel for controls,
               not another navigator.
-            </ThemedText>
-          </ThemedView>
+            </Text>
+          </View>
 
-          <ThemedView style={styles.infoCard}>
-            <ThemedText type="subtitle">Good use cases</ThemedText>
-            <ThemedText style={styles.cardText}>
+          <View style={styles.infoCard}>
+            <Text>Good use cases</Text>
+            <Text style={styles.cardText}>
               Bot settings, environment switches, profile tools, queued jobs, or
               quick actions.
-            </ThemedText>
-          </ThemedView>
-        </ThemedView>
+            </Text>
+          </View>
+        </View>
       </ScrollView>
 
       <Animated.View
@@ -96,8 +94,8 @@ export default function HomeScreen() {
       >
         <View style={styles.drawerHeader}>
           <View>
-            <ThemedText style={styles.drawerLabel}>BOT DRAWER</ThemedText>
-            <ThemedText type="subtitle">Robot Controls</ThemedText>
+            <Text style={styles.drawerLabel}>BOT DRAWER</Text>
+            <Text>Robot Controls</Text>
           </View>
 
           <Pressable
@@ -105,17 +103,17 @@ export default function HomeScreen() {
             onPress={() => setIsDrawerOpen(false)}
             style={styles.closeButton}
           >
-            <ThemedText style={styles.closeButtonText}>Close</ThemedText>
+            <Text style={styles.closeButtonText}>Close</Text>
           </Pressable>
         </View>
 
-        <ThemedView style={styles.drawerCard}>
+        <View style={styles.drawerCard}>
           <View style={styles.settingRow}>
             <View style={styles.settingCopy}>
-              <ThemedText type="defaultSemiBold">Auto pilot</ThemedText>
-              <ThemedText style={styles.settingHint}>
+              <Text>Auto pilot</Text>
+              <Text style={styles.settingHint}>
                 Keep the bot running background routines.
-              </ThemedText>
+              </Text>
             </View>
             <Switch
               trackColor={{ false: "#233041", true: "#22C986" }}
@@ -127,10 +125,10 @@ export default function HomeScreen() {
 
           <View style={styles.settingRow}>
             <View style={styles.settingCopy}>
-              <ThemedText type="defaultSemiBold">Diagnostics mode</ThemedText>
-              <ThemedText style={styles.settingHint}>
+              <Text>Diagnostics mode</Text>
+              <Text style={styles.settingHint}>
                 Expose logs, metrics, and event traces in the panel.
-              </ThemedText>
+              </Text>
             </View>
             <Switch
               trackColor={{ false: "#233041", true: "#22C986" }}
@@ -139,28 +137,22 @@ export default function HomeScreen() {
               onValueChange={setIsDiagnosticsEnabled}
             />
           </View>
-        </ThemedView>
+        </View>
 
-        <ThemedView style={styles.drawerCard}>
-          <ThemedText type="defaultSemiBold">Quick actions</ThemedText>
+        <View style={styles.drawerCard}>
+          <Text>Quick actions</Text>
           <View style={styles.actionList}>
             <Pressable style={styles.secondaryButton}>
-              <ThemedText style={styles.secondaryButtonText}>
-                Run Sync
-              </ThemedText>
+              <Text style={styles.secondaryButtonText}>Run Sync</Text>
             </Pressable>
             <Pressable style={styles.secondaryButton}>
-              <ThemedText style={styles.secondaryButtonText}>
-                Queue Mission
-              </ThemedText>
+              <Text style={styles.secondaryButtonText}>Queue Mission</Text>
             </Pressable>
             <Pressable style={styles.secondaryButton}>
-              <ThemedText style={styles.secondaryButtonText}>
-                Export Logs
-              </ThemedText>
+              <Text style={styles.secondaryButtonText}>Export Logs</Text>
             </Pressable>
           </View>
-        </ThemedView>
+        </View>
       </Animated.View>
     </View>
   );

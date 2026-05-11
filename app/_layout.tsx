@@ -1,7 +1,7 @@
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, usePathname, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -11,6 +11,7 @@ import "react-native-reanimated";
 import "./global.css";
 
 import { Colors } from "@/constants/theme";
+import { useAuthStore } from "@/stores/auth-store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,7 +29,7 @@ const AppTheme = {
 };
 
 export const unstable_settings = {
-  anchor: "(tabs)",
+  anchor: "(auth)",
 };
 
 export default function RootLayout() {
@@ -51,9 +52,32 @@ export default function RootLayout() {
     return null;
   }
 
+  return <RootNavigator />;
+}
+
+function RootNavigator() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const segments = useSegments();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const inAuthGroup = segments[0] === "(auth)";
+
+    if (!isAuthenticated && !inAuthGroup) {
+      router.replace("/register");
+      return;
+    }
+
+    if (isAuthenticated && inAuthGroup) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, pathname, router, segments]);
+
   return (
     <ThemeProvider value={AppTheme}>
       <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
