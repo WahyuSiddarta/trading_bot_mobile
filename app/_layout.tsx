@@ -12,6 +12,7 @@ import "./global.css";
 
 import { Colors } from "@/constants/theme";
 import { useAuthStore } from "@/stores/auth-store";
+import { View } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -49,7 +50,7 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   if (!loaded && !error) {
-    return null;
+    return <View />;
   }
 
   return <RootNavigator />;
