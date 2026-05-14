@@ -1,7 +1,22 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Animated, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+} from "react-native";
 
-interface FormTextInputProps {
+interface FormTextInputProps
+  extends Pick<
+    TextInputProps,
+    | "autoCapitalize"
+    | "autoComplete"
+    | "keyboardType"
+    | "returnKeyType"
+    | "textContentType"
+  > {
   label?: string;
   placeholder?: string;
   value?: string;
@@ -11,6 +26,7 @@ interface FormTextInputProps {
   isFocused?: boolean;
   required?: boolean;
   error?: string;
+  isValid?: boolean;
   editable?: boolean;
   prepend?: ReactNode;
   append?: ReactNode;
@@ -26,12 +42,20 @@ export function FormTextInput({
   isFocused = false,
   required = false,
   error,
+  isValid = false,
   editable = true,
   prepend,
   append,
+  autoCapitalize = "sentences",
+  autoComplete,
+  keyboardType = "default",
+  returnKeyType,
+  textContentType,
 }: FormTextInputProps) {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const isFloating = isFocused || isInputFocused || Boolean(value);
+  const isActive = isFocused || isInputFocused;
+  const hasValidState = isValid && !error;
   const labelProgress = useRef(new Animated.Value(isFloating ? 1 : 0)).current;
 
   useEffect(() => {
@@ -42,16 +66,34 @@ export function FormTextInput({
     }).start();
   }, [isFloating, labelProgress]);
 
+  const inputContainerClassName = `rounded-2xl border-2 flex-row items-center px-4 ${
+    isFloating ? "pt-1" : ""
+  } ${
+    error
+      ? "border-red-500 bg-slate-950"
+      : hasValidState
+        ? "border-green-500 bg-slate-900"
+        : isActive
+          ? "border-sky-400 bg-slate-900"
+          : "border-slate-800 bg-slate-950"
+  }`;
+
   const labelContainerStyle = {
-    backgroundColor:
-      isFocused || isInputFocused ? "#0f172a" : error ? "#020617" : "#020617",
+    backgroundColor: isActive || hasValidState ? "#0f172a" : "#020617",
     top: labelProgress.interpolate({
       inputRange: [0, 1],
-      outputRange: [17, -9],
+      outputRange: [14, -9],
     }),
   };
 
   const labelTextStyle = {
+    color: error
+      ? "#f87171"
+      : isActive
+        ? "#ffffff"
+        : hasValidState
+          ? "#22c55e"
+          : "#5a7a94",
     fontSize: labelProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [16, 12],
@@ -74,18 +116,8 @@ export function FormTextInput({
 
   return (
     <View className="gap-2 pt-2">
-      <View
-        className={`rounded-2xl border-2 flex-row items-center px-4 ${
-          isFloating ? "pt-1" : ""
-        } ${
-          isFocused || isInputFocused
-            ? "border-green-500 bg-slate-900"
-            : error
-              ? "border-red-500 bg-slate-950"
-              : "border-slate-800 bg-slate-950"
-        }`}
-      >
-        {label && (
+      <View className={inputContainerClassName}>
+        {label && isFloating && (
           <Animated.View
             pointerEvents="none"
             style={[styles.labelContainer, labelContainerStyle]}
@@ -98,16 +130,19 @@ export function FormTextInput({
         )}
         {prepend && <View className="mr-2">{prepend}</View>}
         <TextInput
-          placeholder={label && !isFloating ? undefined : placeholder}
+          placeholder={label && !isFloating ? label : placeholder}
           placeholderTextColor="#5a7a94"
-          className="flex-1 text-base font-medium text-emerald-50 py-4"
-          keyboardType="default"
+          className="flex-1 text-base font-medium text-emerald-50 py-3"
+          keyboardType={keyboardType}
           value={value}
           onChangeText={onChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
           editable={editable}
-          autoCapitalize="sentences"
+          autoCapitalize={autoCapitalize}
+          autoComplete={autoComplete}
+          returnKeyType={returnKeyType}
+          textContentType={textContentType}
         />
         {append && <View className="ml-2">{append}</View>}
       </View>

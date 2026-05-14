@@ -1,7 +1,10 @@
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   Keyboard,
   Pressable,
@@ -9,25 +12,68 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import * as yup from "yup";
 
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
 import { useAuthStore } from "@/stores/auth-store";
 
+const loginSchema = yup.object({
+  email: yup
+    .string()
+    .trim()
+    .email("Enter a valid email address")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
+type LoginFormValues = yup.InferType<typeof loginSchema>;
+
+function isLoginFieldValid(field: keyof LoginFormValues, values: LoginFormValues) {
+  try {
+    loginSchema.validateSyncAt(field, values);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function LoginScreen() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
-  const [isLoading, setIsLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const onLogin = async () => {
-    setIsLoading(true);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    login();
-    router.replace("/");
-  };
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { dirtyFields, errors },
+  } = useForm<LoginFormValues>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onChange",
+    resolver: yupResolver(loginSchema),
+  });
+  const formValues = watch();
+
+  const loginMutation = useMutation({
+    mutationFn: async (_values: LoginFormValues) => {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      login();
+    },
+    onSuccess: () => {
+      router.replace("/");
+    },
+  });
+
+  const onLogin = handleSubmit((values) => {
+    loginMutation.mutate(values);
+  });
 
   return (
     <LinearGradient
@@ -64,35 +110,69 @@ export default function LoginScreen() {
             </View>
 
             <View className="gap-4 mt-2">
-              <FormTextInput
-                label="Email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={setEmail}
-                onFocus={() => setFocusedInput("email")}
-                onBlur={() => setFocusedInput(null)}
-                isFocused={focusedInput === "email"}
-                required
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <FormTextInput
+                    label="Email"
+                    placeholder="Enter your email"
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => setFocusedInput("email")}
+                    onBlur={() => {
+                      onBlur();
+                      setFocusedInput(null);
+                    }}
+                    isFocused={focusedInput === "email"}
+                    error={errors.email?.message}
+                    isValid={Boolean(
+                      dirtyFields.email && isLoginFieldValid("email", formValues),
+                    )}
+                    editable={!loginMutation.isPending}
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    textContentType="emailAddress"
+                    returnKeyType="next"
+                    required
+                  />
+                )}
               />
 
-              <FormPasswordInput
-                label="Password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={setPassword}
-                onFocus={() => setFocusedInput("password")}
-                onBlur={() => setFocusedInput(null)}
-                isFocused={focusedInput === "password"}
-                required
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <FormPasswordInput
+                    label="Password"
+                    placeholder="Enter your password"
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => setFocusedInput("password")}
+                    onBlur={() => {
+                      onBlur();
+                      setFocusedInput(null);
+                    }}
+                    isFocused={focusedInput === "password"}
+                    error={errors.password?.message}
+                    isValid={Boolean(
+                      dirtyFields.password &&
+                        isLoginFieldValid("password", formValues),
+                    )}
+                    editable={!loginMutation.isPending}
+                    required
+                  />
+                )}
               />
 
               <Pressable
                 onPress={onLogin}
-                disabled={isLoading}
-                className="mt-4 rounded-2xl bg-green-500 items-center justify-center py-4 active:opacity-85"
+                disabled={loginMutation.isPending}
+                className="mt-4 rounded-2xl bg-green-500 items-center justify-center py-4 active:opacity-85 disabled:opacity-60"
               >
                 <Text className="text-base font-bold text-emerald-950 tracking-wide">
-                  {isLoading ? "Logging in..." : "Login"}
+                  {loginMutation.isPending ? "Logging in..." : "Login"}
                 </Text>
               </Pressable>
             </View>
