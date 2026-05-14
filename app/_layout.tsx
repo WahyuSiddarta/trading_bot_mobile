@@ -3,7 +3,12 @@ import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
-import { Stack, usePathname, useRouter, useSegments } from "expo-router";
+import {
+  Stack,
+  useRootNavigationState,
+  useRouter,
+  useSegments,
+} from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -63,11 +68,15 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const rootNavigationState = useRootNavigationState();
   const segments = useSegments();
-  const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
+    if (!rootNavigationState?.key) {
+      return;
+    }
+
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!isAuthenticated && !inAuthGroup) {
@@ -78,7 +87,7 @@ function RootNavigator() {
     if (isAuthenticated && inAuthGroup) {
       router.replace("/");
     }
-  }, [isAuthenticated, pathname, router, segments]);
+  }, [isAuthenticated, rootNavigationState?.key, router, segments]);
 
   return (
     <QueryClientProvider client={queryClient}>

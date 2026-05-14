@@ -1,4 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome from "@expo/vector-icons/FontAwesome5";
 import { useEffect, useRef, useState } from "react";
 
 import { Animated, Pressable, Text, TextInput, View } from "react-native";
