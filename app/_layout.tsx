@@ -1,3 +1,4 @@
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -6,16 +7,17 @@ import { Stack, usePathname, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import "react-native-ease/nativewind";
 import "react-native-reanimated";
 import "./global.css";
 
-import { Colors } from "@/constants/theme";
 import { ToastProvider } from "@/components/ui/toast";
+import { Colors } from "@/constants/theme";
 import { queryClient } from "@/lib/query-client";
 import { useAuthStore } from "@/stores/auth-store";
-import { View } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -82,16 +84,20 @@ function RootNavigator() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={AppTheme}>
         <ToastProvider>
-          <Stack>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
-          </Stack>
-          <StatusBar style="light" />
-          <PortalHost />
+          <GestureHandlerRootView className="flex-1">
+            <BottomSheetModalProvider>
+              <Stack>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="modal"
+                  options={{ presentation: "modal", title: "Modal" }}
+                />
+              </Stack>
+              <StatusBar style="light" />
+              <PortalHost />
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
         </ToastProvider>
       </ThemeProvider>
     </QueryClientProvider>

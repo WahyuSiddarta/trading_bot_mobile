@@ -1,93 +1,106 @@
-import Icon from "@expo/vector-icons/FontAwesome5";
-import { Pressable, PressableProps, Text } from "react-native";
+import { TextClassContext } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { Platform, Pressable } from 'react-native';
 
-import { cn } from "@/lib/utils";
+const buttonVariants = cva(
+  cn(
+    'group shrink-0 flex-row items-center justify-center gap-2 rounded-md shadow-none',
+    Platform.select({
+      web: "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive whitespace-nowrap outline-none transition-all focus-visible:ring-[3px] disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+    })
+  ),
+  {
+    variants: {
+      variant: {
+        default: cn(
+          'bg-primary active:bg-primary/90 shadow-sm shadow-black/5',
+          Platform.select({ web: 'hover:bg-primary/90' })
+        ),
+        destructive: cn(
+          'bg-destructive active:bg-destructive/90 dark:bg-destructive/60 shadow-sm shadow-black/5',
+          Platform.select({
+            web: 'hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
+          })
+        ),
+        outline: cn(
+          'border-border bg-background active:bg-accent dark:bg-input/30 dark:border-input dark:active:bg-input/50 border shadow-sm shadow-black/5',
+          Platform.select({
+            web: 'hover:bg-accent dark:hover:bg-input/50',
+          })
+        ),
+        secondary: cn(
+          'bg-secondary active:bg-secondary/80 shadow-sm shadow-black/5',
+          Platform.select({ web: 'hover:bg-secondary/80' })
+        ),
+        ghost: cn(
+          'active:bg-accent dark:active:bg-accent/50',
+          Platform.select({ web: 'hover:bg-accent dark:hover:bg-accent/50' })
+        ),
+        link: '',
+      },
+      size: {
+        default: cn('h-10 px-4 py-2 sm:h-9', Platform.select({ web: 'has-[>svg]:px-3' })),
+        sm: cn('h-9 gap-1.5 rounded-md px-3 sm:h-8', Platform.select({ web: 'has-[>svg]:px-2.5' })),
+        lg: cn('h-11 rounded-md px-6 sm:h-10', Platform.select({ web: 'has-[>svg]:px-4' })),
+        icon: 'h-10 w-10 sm:h-9 sm:w-9',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
-type ButtonSize = "md" | "lg";
+const buttonTextVariants = cva(
+  cn(
+    'text-foreground text-sm font-medium',
+    Platform.select({ web: 'pointer-events-none transition-colors' })
+  ),
+  {
+    variants: {
+      variant: {
+        default: 'text-primary-foreground',
+        destructive: 'text-white',
+        outline: cn(
+          'group-active:text-accent-foreground',
+          Platform.select({ web: 'group-hover:text-accent-foreground' })
+        ),
+        secondary: 'text-secondary-foreground',
+        ghost: 'group-active:text-accent-foreground',
+        link: cn(
+          'text-primary group-active:underline',
+          Platform.select({ web: 'underline-offset-4 hover:underline group-hover:underline' })
+        ),
+      },
+      size: {
+        default: '',
+        sm: '',
+        lg: '',
+        icon: '',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
 
-interface ButtonProps extends Omit<PressableProps, "children"> {
-  title: string;
-  loading?: boolean;
-  loadingTitle?: string;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  className?: string;
-  textClassName?: string;
-}
+type ButtonProps = React.ComponentProps<typeof Pressable> & React.RefAttributes<typeof Pressable> & VariantProps<typeof buttonVariants>;
 
-const variantClassNames: Record<ButtonVariant, string> = {
-  primary: "bg-green-500",
-  secondary: "border border-slate-700 bg-slate-900",
-  ghost: "bg-transparent",
-};
-
-const textVariantClassNames: Record<ButtonVariant, string> = {
-  primary: "text-emerald-950",
-  secondary: "text-emerald-50",
-  ghost: "text-green-500",
-};
-
-const iconVariantColors: Record<ButtonVariant, string> = {
-  primary: "#022c22",
-  secondary: "#ecfdf5",
-  ghost: "#22c55e",
-};
-
-const sizeClassNames: Record<ButtonSize, string> = {
-  md: "min-h-12 rounded-xl px-4",
-  lg: "min-h-14 rounded-2xl px-5",
-};
-
-const iconSize: Record<ButtonSize, number> = {
-  md: 16,
-  lg: 18,
-};
-
-export function Button({
-  title,
-  loadingTitle,
-  loading = false,
-  disabled = false,
-  variant = "primary",
-  size = "md",
-  className,
-  textClassName,
-  ...props
-}: ButtonProps) {
-  const isDisabled = disabled || loading;
-  const displayTitle = loading ? (loadingTitle ?? title) : title;
-
+function Button({ className, variant, size, ...props }: ButtonProps) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
-      disabled={isDisabled}
-      className={cn(
-        "flex-row items-center justify-center gap-2 active:opacity-85 disabled:opacity-60",
-        variantClassNames[variant],
-        sizeClassNames[size],
-        className,
-      )}
-      {...props}
-    >
-      {loading && (
-        <Icon
-          name="spinner"
-          size={iconSize[size]}
-          color={iconVariantColors[variant]}
-          className="animate-spin"
-        />
-      )}
-      <Text
-        className={cn(
-          "text-base font-bold tracking-wide",
-          textVariantClassNames[variant],
-          textClassName,
-        )}
-      >
-        {displayTitle}
-      </Text>
-    </Pressable>
+    <TextClassContext.Provider value={buttonTextVariants({ variant, size })}>
+      <Pressable
+        className={cn(props.disabled && 'opacity-50', buttonVariants({ variant, size }), className)}
+        role="button"
+        {...props}
+      />
+    </TextClassContext.Provider>
   );
 }
+
+export { Button, buttonTextVariants, buttonVariants };
+export type { ButtonProps };

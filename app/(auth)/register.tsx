@@ -14,9 +14,9 @@ import {
 } from "react-native";
 import * as yup from "yup";
 
-import { Button } from "@/components/ui/button";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
+import { Button } from "@/components/ui/my-button";
 import { useAuthStore } from "@/stores/auth-store";
 
 const registerSchema = yup.object({
@@ -133,7 +133,7 @@ export default function RegisterScreen() {
                     error={errors.email?.message}
                     isValid={Boolean(
                       dirtyFields.email &&
-                        isRegisterFieldValid("email", formValues),
+                      isRegisterFieldValid("email", formValues),
                     )}
                     editable={!registerMutation.isPending}
                     autoCapitalize="none"
@@ -164,7 +164,7 @@ export default function RegisterScreen() {
                     error={errors.password?.message}
                     isValid={Boolean(
                       dirtyFields.password &&
-                        isRegisterFieldValid("password", formValues),
+                      isRegisterFieldValid("password", formValues),
                     )}
                     editable={!registerMutation.isPending}
                     required

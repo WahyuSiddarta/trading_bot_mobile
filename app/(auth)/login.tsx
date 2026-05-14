@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Keyboard,
@@ -14,11 +14,12 @@ import {
 } from "react-native";
 import * as yup from "yup";
 
-import { Button } from "@/components/ui/button";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
+import { Button } from "@/components/ui/my-button";
 import { useToast } from "@/components/ui/toast";
 import { useAuthStore } from "@/stores/auth-store";
+import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 
 const loginSchema = yup.object({
   email: yup
@@ -80,6 +81,17 @@ export default function LoginScreen() {
   const onLogin = handleSubmit((values) => {
     loginMutation.mutate(values);
   });
+
+  // ref
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  // callbacks
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
 
   return (
     <LinearGradient
@@ -192,6 +204,20 @@ export default function LoginScreen() {
                   )
                 }
               />
+              <Button
+                title="Show gorhum demo"
+                variant="secondary"
+                onPress={handlePresentModalPress}
+              />
+
+              <BottomSheetModal
+                ref={bottomSheetModalRef}
+                onChange={handleSheetChanges}
+              >
+                <BottomSheetView style={{ flex: 1, alignItems: "center" }}>
+                  <Text>Awesome 🎉</Text>
+                </BottomSheetView>
+              </BottomSheetModal>
             </View>
 
             <View className="gap-4 mt-2">
