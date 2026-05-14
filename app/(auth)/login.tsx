@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import * as yup from "yup";
 
+import { Button } from "@/components/ui/button";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
 import { useAuthStore } from "@/stores/auth-store";
@@ -32,7 +33,10 @@ const loginSchema = yup.object({
 
 type LoginFormValues = yup.InferType<typeof loginSchema>;
 
-function isLoginFieldValid(field: keyof LoginFormValues, values: LoginFormValues) {
+function isLoginFieldValid(
+  field: keyof LoginFormValues,
+  values: LoginFormValues,
+) {
   try {
     loginSchema.validateSyncAt(field, values);
     return true;
@@ -104,7 +108,7 @@ export default function LoginScreen() {
               <Text className="text-4xl font-black text-white leading-tight">
                 Login
               </Text>
-              <Text className="text-base text-slate-400 leading-6">
+              <Text className="text-sm text-slate-400 leading-6">
                 Sign in to access your robot dashboard
               </Text>
             </View>
@@ -127,7 +131,8 @@ export default function LoginScreen() {
                     isFocused={focusedInput === "email"}
                     error={errors.email?.message}
                     isValid={Boolean(
-                      dirtyFields.email && isLoginFieldValid("email", formValues),
+                      dirtyFields.email &&
+                      isLoginFieldValid("email", formValues),
                     )}
                     editable={!loginMutation.isPending}
                     autoCapitalize="none"
@@ -158,7 +163,7 @@ export default function LoginScreen() {
                     error={errors.password?.message}
                     isValid={Boolean(
                       dirtyFields.password &&
-                        isLoginFieldValid("password", formValues),
+                      isLoginFieldValid("password", formValues),
                     )}
                     editable={!loginMutation.isPending}
                     required
@@ -166,15 +171,14 @@ export default function LoginScreen() {
                 )}
               />
 
-              <Pressable
+              <Button
+                title="Login"
+                loadingTitle="Logging in..."
                 onPress={onLogin}
-                disabled={loginMutation.isPending}
-                className="mt-4 rounded-2xl bg-green-500 items-center justify-center py-4 active:opacity-85 disabled:opacity-60"
-              >
-                <Text className="text-base font-bold text-emerald-950 tracking-wide">
-                  {loginMutation.isPending ? "Logging in..." : "Login"}
-                </Text>
-              </Pressable>
+                loading={loginMutation.isPending || true}
+                className="mt-4"
+                size="lg"
+              />
             </View>
 
             <View className="gap-4 mt-2">

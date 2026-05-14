@@ -67,7 +67,7 @@ export function FormTextInput({
   }, [isFloating, labelProgress]);
 
   const inputContainerClassName = `rounded-2xl border-2 flex-row items-center px-4 ${
-    isFloating ? "pt-1" : ""
+    label ? "pt-1" : ""
   } ${
     error
       ? "border-red-500 bg-slate-950"
@@ -117,7 +117,7 @@ export function FormTextInput({
   return (
     <View className="gap-2 pt-2">
       <View className={inputContainerClassName}>
-        {label && isFloating && (
+        {label && (
           <Animated.View
             pointerEvents="none"
             style={[styles.labelContainer, labelContainerStyle]}
@@ -130,7 +130,7 @@ export function FormTextInput({
         )}
         {prepend && <View className="mr-2">{prepend}</View>}
         <TextInput
-          placeholder={label && !isFloating ? label : placeholder}
+          placeholder={label ? (isFloating ? placeholder : "") : placeholder}
           placeholderTextColor="#5a7a94"
           className="flex-1 text-base font-medium text-emerald-50 py-3"
           keyboardType={keyboardType}
