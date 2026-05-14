@@ -1,12 +1,7 @@
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+
+import { Animated, Pressable, Text, TextInput, View } from "react-native";
 
 interface FormPasswordInputProps {
   label?: string;
@@ -85,6 +80,13 @@ export function FormPasswordInput({
       outputRange: [22, 16],
     }),
   };
+  const passwordIconColor = error
+    ? "#f87171"
+    : isActive
+      ? "#e5fff0"
+      : hasValidState
+        ? "#22c55e"
+        : "#94a3b8";
 
   const handleFocus = () => {
     setIsInputFocused(true);
@@ -101,10 +103,11 @@ export function FormPasswordInput({
       <View className={inputContainerClassName}>
         {label && (
           <Animated.View
+            className="absolute left-3.5 z-10 flex-row items-center gap-1 px-1"
             pointerEvents="none"
-            style={[styles.labelContainer, labelContainerStyle]}
+            style={labelContainerStyle}
           >
-            <Animated.Text style={[styles.label, labelTextStyle]}>
+            <Animated.Text className="font-medium" style={labelTextStyle}>
               {label}
             </Animated.Text>
             {required && <Text className="text-red-400 font-bold">*</Text>}
@@ -124,11 +127,17 @@ export function FormPasswordInput({
         />
         <Pressable
           onPress={() => setShowPassword(!showPassword)}
-          className="active:opacity-70"
+          disabled={!editable}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+          className="ml-2 h-10 w-10 items-center justify-center rounded-full active:bg-slate-800/70 disabled:opacity-50"
         >
-          <Text className="text-base text-slate-400">
-            {showPassword ? "👁️" : "👁️‍🗨️"}
-          </Text>
+          <FontAwesome
+            name={showPassword ? "eye" : "eye-slash"}
+            size={18}
+            color={passwordIconColor}
+          />
         </Pressable>
       </View>
       {error && (
@@ -137,20 +146,3 @@ export function FormPasswordInput({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  labelContainer: {
-    alignItems: "center",
-    backgroundColor: "#020617",
-    flexDirection: "row",
-    gap: 4,
-    left: 14,
-    paddingHorizontal: 4,
-    position: "absolute",
-    zIndex: 1,
-  },
-  label: {
-    color: "#5a7a94",
-    fontWeight: "500",
-  },
-});

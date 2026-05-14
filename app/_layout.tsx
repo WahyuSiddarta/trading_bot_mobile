@@ -12,6 +12,7 @@ import "react-native-reanimated";
 import "./global.css";
 
 import { Colors } from "@/constants/theme";
+import { ToastProvider } from "@/components/ui/toast";
 import { queryClient } from "@/lib/query-client";
 import { useAuthStore } from "@/stores/auth-store";
 import { View } from "react-native";
@@ -80,16 +81,18 @@ function RootNavigator() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={AppTheme}>
-        <Stack>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: "modal", title: "Modal" }}
-          />
-        </Stack>
-        <StatusBar style="light" />
-        <PortalHost />
+        <ToastProvider>
+          <Stack>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="modal"
+              options={{ presentation: "modal", title: "Modal" }}
+            />
+          </Stack>
+          <StatusBar style="light" />
+          <PortalHost />
+        </ToastProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

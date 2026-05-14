@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Animated, StyleSheet, Text, TextInput, View } from "react-native";
+import { Animated, Text, TextInput, View } from "react-native";
 
 interface FormNumberInputProps {
   label?: string;
@@ -97,10 +97,11 @@ export function FormNumberInput({
       <View className={inputContainerClassName}>
         {label && (
           <Animated.View
+            className="absolute left-3.5 z-10 flex-row items-center gap-1 px-1"
             pointerEvents="none"
-            style={[styles.labelContainer, labelContainerStyle]}
+            style={labelContainerStyle}
           >
-            <Animated.Text style={[styles.label, labelTextStyle]}>
+            <Animated.Text className="font-medium" style={labelTextStyle}>
               {label}
             </Animated.Text>
             {required && <Text className="text-red-400 font-bold">*</Text>}
@@ -127,20 +128,3 @@ export function FormNumberInput({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  labelContainer: {
-    alignItems: "center",
-    backgroundColor: "#020617",
-    flexDirection: "row",
-    gap: 4,
-    left: 14,
-    paddingHorizontal: 4,
-    position: "absolute",
-    zIndex: 1,
-  },
-  label: {
-    color: "#5a7a94",
-    fontWeight: "500",
-  },
-});

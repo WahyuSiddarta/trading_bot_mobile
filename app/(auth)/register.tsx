@@ -1,115 +1,205 @@
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import {
+  Keyboard,
+  Pressable,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import * as yup from "yup";
 
+import { Button } from "@/components/ui/button";
+import { FormPasswordInput } from "@/components/ui/form-password-input";
+import { FormTextInput } from "@/components/ui/form-text-input";
 import { useAuthStore } from "@/stores/auth-store";
+
+const registerSchema = yup.object({
+  email: yup
+    .string()
+    .trim()
+    .email("Enter a valid email address")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
+type RegisterFormValues = yup.InferType<typeof registerSchema>;
+
+function isRegisterFieldValid(
+  field: keyof RegisterFormValues,
+  values: RegisterFormValues,
+) {
+  try {
+    registerSchema.validateSyncAt(field, values);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export default function RegisterScreen() {
   const router = useRouter();
   const register = useAuthStore((state) => state.register);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
-  const onRegister = () => {
-    register();
-    router.replace("/");
-  };
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { dirtyFields, errors },
+  } = useForm<RegisterFormValues>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onChange",
+    resolver: yupResolver(registerSchema),
+  });
+  const formValues = watch();
+
+  const registerMutation = useMutation({
+    mutationFn: async (_values: RegisterFormValues) => {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      register();
+    },
+    onSuccess: () => {
+      router.replace("/");
+    },
+  });
+
+  const onRegister = handleSubmit((values) => {
+    registerMutation.mutate(values);
+  });
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.card}>
-        <Text style={styles.eyebrow}>CREATE ACCOUNT</Text>
-        <Text style={styles.title}>Register</Text>
-        <Text style={styles.description}>
-          All app routes are protected. Create your account to continue.
-        </Text>
+    <LinearGradient
+      colors={["#02050c", "#071b17", "#020817"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      className="flex-1"
+    >
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Keyboard.dismiss();
+          setFocusedInput(null);
+        }}
+      >
+        <View className="flex-1 justify-center px-6 py-8">
+          <View className="absolute inset-0 overflow-hidden">
+            <View className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-emerald-500 opacity-20 blur-3xl" />
+            <View className="absolute top-1/3 -left-28 h-72 w-72 rounded-full bg-cyan-700 opacity-20 blur-3xl" />
+            <View className="absolute -bottom-24 right-8 h-96 w-96 rounded-full bg-lime-700 opacity-10 blur-3xl" />
+            <View className="absolute left-6 right-6 top-24 h-px bg-emerald-400 opacity-20" />
+            <View className="absolute bottom-28 left-12 right-16 h-px bg-cyan-300 opacity-10" />
+          </View>
 
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#6f8599"
-          style={styles.input}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#6f8599"
-          style={styles.input}
-          secureTextEntry
-        />
+          <View className="relative z-10 gap-8">
+            <View className="gap-3">
+              <Text className="text-green-500 text-xs font-bold tracking-widest uppercase">
+                Create Account
+              </Text>
+              <Text className="text-4xl font-black text-white leading-tight">
+                Register
+              </Text>
+              <Text className="text-sm text-slate-400 leading-6">
+                Create your account to access your robot dashboard
+              </Text>
+            </View>
 
-        <Pressable onPress={onRegister} style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>Register</Text>
-        </Pressable>
+            <View className="gap-4 mt-2">
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <FormTextInput
+                    label="Email"
+                    placeholder="Enter your email"
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => setFocusedInput("email")}
+                    onBlur={() => {
+                      onBlur();
+                      setFocusedInput(null);
+                    }}
+                    isFocused={focusedInput === "email"}
+                    error={errors.email?.message}
+                    isValid={Boolean(
+                      dirtyFields.email &&
+                        isRegisterFieldValid("email", formValues),
+                    )}
+                    editable={!registerMutation.isPending}
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    textContentType="emailAddress"
+                    returnKeyType="next"
+                    required
+                  />
+                )}
+              />
 
-        <View style={styles.inlineRow}>
-          <Text style={styles.secondaryText}>Already have an account?</Text>
-          <Link href="/login" asChild>
-            <Pressable>
-              <Text style={styles.linkText}>Login</Text>
-            </Pressable>
-          </Link>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <FormPasswordInput
+                    label="Password"
+                    placeholder="Create your password"
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => setFocusedInput("password")}
+                    onBlur={() => {
+                      onBlur();
+                      setFocusedInput(null);
+                    }}
+                    isFocused={focusedInput === "password"}
+                    error={errors.password?.message}
+                    isValid={Boolean(
+                      dirtyFields.password &&
+                        isRegisterFieldValid("password", formValues),
+                    )}
+                    editable={!registerMutation.isPending}
+                    required
+                  />
+                )}
+              />
+
+              <Button
+                title="Register"
+                loadingTitle="Creating account..."
+                onPress={onRegister}
+                loading={registerMutation.isPending}
+                className="mt-4"
+                size="lg"
+              />
+            </View>
+
+            <View className="gap-4 mt-2">
+              <View className="h-px bg-slate-800" />
+              <View className="flex-row gap-2 justify-center items-center">
+                <Text className="text-sm font-medium text-slate-400">
+                  Already have an account?
+                </Text>
+                <Link href="/login" asChild>
+                  <Pressable onPress={() => Haptics.selectionAsync()}>
+                    <Text className="text-sm font-bold text-green-500">
+                      Login
+                    </Text>
+                  </Pressable>
+                </Link>
+              </View>
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
+      </TouchableWithoutFeedback>
+    </LinearGradient>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#02060c",
-  },
-  card: {
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#17314d",
-    backgroundColor: "#07111f",
-    padding: 20,
-    gap: 12,
-  },
-  eyebrow: {
-    color: "#22C986",
-    letterSpacing: 1.6,
-    fontSize: 12,
-  },
-  title: {
-    lineHeight: 36,
-  },
-  description: {
-    color: "#9fb3c8",
-    marginBottom: 6,
-  },
-  input: {
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#234362",
-    backgroundColor: "#0b1727",
-    color: "#e5fff0",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  primaryButton: {
-    marginTop: 8,
-    borderRadius: 999,
-    backgroundColor: "#22C986",
-    alignItems: "center",
-    paddingVertical: 12,
-  },
-  primaryButtonText: {
-    color: "#021106",
-    fontWeight: "700",
-  },
-  inlineRow: {
-    marginTop: 8,
-    flexDirection: "row",
-    gap: 8,
-    justifyContent: "center",
-  },
-  secondaryText: {
-    color: "#9fb3c8",
-  },
-  linkText: {
-    color: "#22C986",
-    fontWeight: "600",
-  },
-});

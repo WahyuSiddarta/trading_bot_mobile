@@ -17,6 +17,7 @@ import * as yup from "yup";
 import { Button } from "@/components/ui/button";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
+import { useToast } from "@/components/ui/toast";
 import { useAuthStore } from "@/stores/auth-store";
 
 const loginSchema = yup.object({
@@ -48,6 +49,7 @@ function isLoginFieldValid(
 export default function LoginScreen() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const toast = useToast();
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   const {
@@ -175,9 +177,20 @@ export default function LoginScreen() {
                 title="Login"
                 loadingTitle="Logging in..."
                 onPress={onLogin}
-                loading={loginMutation.isPending || true}
+                loading={loginMutation.isPending}
                 className="mt-4"
                 size="lg"
+              />
+
+              <Button
+                title="Show toast demo"
+                variant="secondary"
+                onPress={() =>
+                  toast.warning(
+                    "Toast is ready",
+                    "This message can be triggered from any screen.",
+                  )
+                }
               />
             </View>
 
