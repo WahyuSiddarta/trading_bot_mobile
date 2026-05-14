@@ -7,6 +7,7 @@ import { Platform } from "react-native";
 
 const tintColor = "#22C986";
 const backgroundColor = "#030712";
+const secondaryBackgroundColor = "#0b1729";
 const surfaceColor = "#07111f";
 const elevatedSurfaceColor = "#0b1729";
 const textColor = "#e5fff0";
@@ -17,6 +18,7 @@ export const Colors = {
   light: {
     text: textColor,
     background: backgroundColor,
+    secondaryBackgroundColor: secondaryBackgroundColor,
     tint: tintColor,
     icon: mutedColor,
     tabIconDefault: mutedColor,
@@ -28,6 +30,7 @@ export const Colors = {
   dark: {
     text: textColor,
     background: backgroundColor,
+    secondaryBackgroundColor: secondaryBackgroundColor,
     tint: tintColor,
     icon: mutedColor,
     tabIconDefault: mutedColor,
