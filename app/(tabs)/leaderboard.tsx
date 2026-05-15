@@ -2,9 +2,15 @@ import { Colors } from "@/constants/theme";
 import { useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TabBar, TabView } from "react-native-tab-view";
+import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
 import { LeaderboardList } from "../leaderboard/profit-leaderboard";
+import { ReferralLeaderboard } from "../leaderboard/referal-leaderboard";
+
+const renderScene = SceneMap({
+  profit: LeaderboardList,
+  referral: ReferralLeaderboard,
+});
 
 export default function Leaderboard() {
   const layout = useWindowDimensions();
@@ -33,7 +39,7 @@ export default function Leaderboard() {
             ],
           }}
           onIndexChange={setIndex}
-          renderScene={() => <LeaderboardList />}
+          renderScene={renderScene}
           renderTabBar={(props) => (
             <TabBar
               {...props}

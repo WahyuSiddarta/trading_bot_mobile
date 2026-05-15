@@ -1,5 +1,4 @@
 import WreathIcon from "@/assets/icon/wreath";
-import { AnimatedTabs } from "@/components/ui/animated-tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { leaderboardMock } from "@/mockresponse/leaderboard";
 import { LinearGradient } from "expo-linear-gradient";
@@ -334,7 +333,7 @@ function LeaderboardRowSkeleton() {
   );
 }
 
-export function LeaderboardList() {
+export function ReferralLeaderboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -393,25 +392,13 @@ export function LeaderboardList() {
       }
     >
       <View className="px-5 pt-4">
-        <AnimatedTabs
-          items={[
-            { label: "Daily", value: "daily" },
-            { label: "Weekly", value: "weekly" },
-            { label: "Monthly", value: "monthly" },
-          ]}
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value)}
-          maxPerRow={3}
-        />
-      </View>
-      <View className="px-5 pt-4">
         <View className="flex-row items-end justify-between mb-4">
           <View>
             <Text className="text-xs font-bold tracking-widest uppercase text-primary">
-              Top Traders
+              Top users
             </Text>
             <Text className="mt-1 text-2xl font-bold tracking-tighter text-white">
-              Profit Leaderboard
+              Referal Ranking
             </Text>
           </View>
         </View>

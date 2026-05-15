@@ -36,7 +36,7 @@ function Skeleton({
 
   return (
     <Animated.View
-      className={cn("bg-accent rounded-md", className)}
+      className={cn("rounded-md border border-white/5 bg-[#243246]", className)}
       {...props}
       style={[animatedStyle, props.style]}
     />
