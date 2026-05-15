@@ -1,6 +1,6 @@
 import { leaderboardMock } from "@/mockresponse/leaderboard";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
+import { Crown, Medal } from "lucide-react-native";
 import { ScrollView, Text, View } from "react-native";
 
 type LeaderboardEntry = (typeof leaderboardMock.data)[number];
@@ -25,7 +25,7 @@ const podiumStyles = {
     border: "border-[#F8C847]",
     card: "min-h-[228px]",
     gradient: ["#3A2A08", "#151205", "#07111f"] as const,
-    icon: "crown" as const,
+    Icon: Crown,
     label: "text-[#F8C847]",
     medal: "Gold",
     rank: "bg-[#F8C847]",
@@ -38,7 +38,7 @@ const podiumStyles = {
     border: "border-[#D6DEE8]",
     card: "min-h-[200px]",
     gradient: ["#24313E", "#101A25", "#07111f"] as const,
-    icon: "medal-outline" as const,
+    Icon: Medal,
     label: "text-[#D6DEE8]",
     medal: "Silver",
     rank: "bg-[#D6DEE8]",
@@ -51,7 +51,7 @@ const podiumStyles = {
     border: "border-[#C9784B]",
     card: "min-h-[188px]",
     gradient: ["#3A2014", "#160F0C", "#07111f"] as const,
-    icon: "medal-outline" as const,
+    Icon: Medal,
     label: "text-[#C9784B]",
     medal: "Bronze",
     rank: "bg-[#C9784B]",
@@ -129,6 +129,7 @@ function PodiumCard({
 }) {
   const isCurrentUserPodium = isCurrentUser(entry);
   const podiumStyle = podiumStyles[rank];
+  const PodiumIcon = podiumStyle.Icon;
 
   return (
     <View className="flex-1">
@@ -155,10 +156,10 @@ function PodiumCard({
         </View>
 
         <View className="absolute right-3 top-3">
-          <MaterialCommunityIcons
+          <PodiumIcon
             color={podiumStyle.accent}
-            name={podiumStyle.icon}
             size={featured ? 24 : 20}
+            strokeWidth={2.3}
           />
         </View>
 

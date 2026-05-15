@@ -1,7 +1,15 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome5";
-import { useEffect, useRef, useState } from "react";
+import { Eye, EyeClosed } from "lucide-react-native";
+import { useEffect, useState } from "react";
 
-import { Animated, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
+import Animated, {
+  Easing,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 interface FormPasswordInputProps {
   label?: string;
@@ -35,14 +43,13 @@ export function FormPasswordInput({
   const isFloating = isFocused || isInputFocused || Boolean(value);
   const isActive = isFocused || isInputFocused;
   const hasValidState = isValid && !error;
-  const labelProgress = useRef(new Animated.Value(isFloating ? 1 : 0)).current;
+  const labelProgress = useSharedValue(isFloating ? 1 : 0);
 
   useEffect(() => {
-    Animated.timing(labelProgress, {
-      toValue: isFloating ? 1 : 0,
+    labelProgress.value = withTiming(isFloating ? 1 : 0, {
       duration: 180,
-      useNativeDriver: false,
-    }).start();
+      easing: Easing.out(Easing.cubic),
+    });
   }, [isFloating, labelProgress]);
 
   const inputContainerClassName = `rounded-2xl border-2 flex-row items-center px-4 ${
@@ -56,30 +63,33 @@ export function FormPasswordInput({
           ? "border-sky-400 bg-slate-900"
           : "border-slate-800 bg-slate-950"
   }`;
-  const labelContainerStyle = {
-    backgroundColor: isActive || hasValidState ? "#0f172a" : "#020617",
-    top: labelProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [14, -9],
-    }),
-  };
-  const labelTextStyle = {
-    color: error
-      ? "#f87171"
-      : isActive
-        ? "#ffffff"
-        : hasValidState
-          ? "#22c55e"
-          : "#5a7a94",
-    fontSize: labelProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [16, 12],
-    }),
-    lineHeight: labelProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [22, 16],
-    }),
-  };
+  const labelBackgroundColor =
+    isActive || hasValidState ? "#0f172a" : "#020617";
+  const labelColor = error
+    ? "#f87171"
+    : isActive
+      ? "#ffffff"
+      : hasValidState
+        ? "#22c55e"
+        : "#5a7a94";
+
+  const labelContainerStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      labelProgress.value,
+      [0, 1],
+      ["#020617", labelBackgroundColor],
+    ),
+    top: interpolate(labelProgress.value, [0, 1], [14, -9]),
+  }));
+  const labelTextStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      labelProgress.value,
+      [0, 1],
+      ["#5a7a94", labelColor],
+    ),
+    fontSize: interpolate(labelProgress.value, [0, 1], [16, 12]),
+    lineHeight: interpolate(labelProgress.value, [0, 1], [22, 16]),
+  }));
   const passwordIconColor = error
     ? "#f87171"
     : isActive
@@ -87,6 +97,7 @@ export function FormPasswordInput({
       : hasValidState
         ? "#22c55e"
         : "#94a3b8";
+  const PasswordIcon = showPassword ? Eye : EyeClosed;
 
   const handleFocus = () => {
     setIsInputFocused(true);
@@ -110,13 +121,13 @@ export function FormPasswordInput({
             <Animated.Text className="font-medium" style={labelTextStyle}>
               {label}
             </Animated.Text>
-            {required && <Text className="text-red-400 font-bold">*</Text>}
+            {required && <Text className="font-bold text-red-400">*</Text>}
           </Animated.View>
         )}
         <TextInput
           placeholder={label ? (isFloating ? placeholder : "") : placeholder}
           placeholderTextColor="#5a7a94"
-          className="flex-1 text-base font-medium text-emerald-50 py-3"
+          className="flex-1 py-3 text-base font-medium text-emerald-50"
           secureTextEntry={!showPassword}
           value={value}
           onChangeText={onChange}
@@ -131,12 +142,12 @@ export function FormPasswordInput({
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel={showPassword ? "Hide password" : "Show password"}
-          className="ml-2 h-10 w-10 items-center justify-center rounded-full active:bg-slate-800/70 disabled:opacity-50"
+          className="items-center justify-center w-10 h-10 ml-2 rounded-full active:bg-slate-800/70 disabled:opacity-50"
         >
-          <FontAwesome
-            name={showPassword ? "eye" : "eye-slash"}
-            size={18}
+          <PasswordIcon
+            size={20}
             color={passwordIconColor}
+            strokeWidth={2.2}
           />
         </Pressable>
       </View>

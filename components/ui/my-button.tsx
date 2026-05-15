@@ -1,5 +1,14 @@
-import Icon from "@expo/vector-icons/FontAwesome5";
+import { LoaderCircle } from "lucide-react-native";
+import { useEffect } from "react";
 import { Pressable, PressableProps, Text } from "react-native";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 import { cn } from "@/lib/utils";
 
@@ -14,6 +23,10 @@ interface ButtonProps extends Omit<PressableProps, "children"> {
   size?: ButtonSize;
   className?: string;
   textClassName?: string;
+  loadingIconClassName?: string;
+  loadingIconColor?: string;
+  loadingIconSize?: number;
+  loadingIconStrokeWidth?: number;
 }
 
 const variantClassNames: Record<ButtonVariant, string> = {
@@ -53,10 +66,39 @@ export function Button({
   size = "md",
   className,
   textClassName,
+  loadingIconClassName,
+  loadingIconColor,
+  loadingIconSize,
+  loadingIconStrokeWidth = 2.4,
   ...props
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const displayTitle = loading ? (loadingTitle ?? title) : title;
+  const spinnerProgress = useSharedValue(0);
+  const spinnerColor = loadingIconColor ?? iconVariantColors[variant];
+  const spinnerSize = loadingIconSize ?? iconSize[size];
+
+  useEffect(() => {
+    if (!loading) {
+      cancelAnimation(spinnerProgress);
+      spinnerProgress.value = 0;
+      return;
+    }
+
+    spinnerProgress.value = 0;
+    spinnerProgress.value = withRepeat(
+      withTiming(1, {
+        duration: 900,
+        easing: Easing.linear,
+      }),
+      -1,
+      false,
+    );
+  }, [loading, spinnerProgress]);
+
+  const spinnerStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${spinnerProgress.value * 360}deg` }],
+  }));
 
   return (
     <Pressable
@@ -72,12 +114,14 @@ export function Button({
       {...props}
     >
       {loading && (
-        <Icon
-          name="spinner"
-          size={iconSize[size]}
-          color={iconVariantColors[variant]}
-          className="animate-spin"
-        />
+        <Animated.View style={spinnerStyle}>
+          <LoaderCircle
+            className={loadingIconClassName}
+            size={spinnerSize}
+            color={spinnerColor}
+            strokeWidth={loadingIconStrokeWidth}
+          />
+        </Animated.View>
       )}
       <Text
         className={cn(

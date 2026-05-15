@@ -1,9 +1,8 @@
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Tabs } from "expo-router";
+import { House, Medal, Send } from "lucide-react-native";
 import React from "react";
 
 import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 
 export default function TabLayout() {
@@ -28,7 +27,7 @@ export default function TabLayout() {
         options={{
           title: "Leaderboard",
           tabBarIcon: ({ color }) => (
-            <FontAwesome5 size={28} name="medal" color={color} />
+            <Medal size={28} color={color} strokeWidth={2.2} />
           ),
         }}
       />
@@ -37,7 +36,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <House size={28} color={color} strokeWidth={2.2} />
           ),
         }}
       />
@@ -47,7 +46,7 @@ export default function TabLayout() {
         options={{
           title: "Explore",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <Send size={28} color={color} strokeWidth={2.2} />
           ),
         }}
       />

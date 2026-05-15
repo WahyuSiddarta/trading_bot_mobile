@@ -1,11 +1,13 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-} from "react-native";
+import { ReactNode, useEffect, useState } from "react";
+import { Text, TextInput, TextInputProps, View } from "react-native";
+import Animated, {
+  Easing,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 interface FormTextInputProps
   extends Pick<
@@ -55,14 +57,13 @@ export function FormTextInput({
   const isFloating = isFocused || isInputFocused || Boolean(value);
   const isActive = isFocused || isInputFocused;
   const hasValidState = isValid && !error;
-  const labelProgress = useRef(new Animated.Value(isFloating ? 1 : 0)).current;
+  const labelProgress = useSharedValue(isFloating ? 1 : 0);
 
   useEffect(() => {
-    Animated.timing(labelProgress, {
-      toValue: isFloating ? 1 : 0,
+    labelProgress.value = withTiming(isFloating ? 1 : 0, {
       duration: 180,
-      useNativeDriver: false,
-    }).start();
+      easing: Easing.out(Easing.cubic),
+    });
   }, [isFloating, labelProgress]);
 
   const inputContainerClassName = `rounded-2xl border-2 flex-row items-center px-4 ${
@@ -77,31 +78,29 @@ export function FormTextInput({
           : "border-slate-800 bg-slate-950"
   }`;
 
-  const labelContainerStyle = {
-    backgroundColor: isActive || hasValidState ? "#0f172a" : "#020617",
-    top: labelProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [14, -9],
-    }),
-  };
+  const labelBackgroundColor = isActive || hasValidState ? "#0f172a" : "#020617";
+  const labelColor = error
+    ? "#f87171"
+    : isActive
+      ? "#ffffff"
+      : hasValidState
+        ? "#22c55e"
+        : "#5a7a94";
 
-  const labelTextStyle = {
-    color: error
-      ? "#f87171"
-      : isActive
-        ? "#ffffff"
-        : hasValidState
-          ? "#22c55e"
-          : "#5a7a94",
-    fontSize: labelProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [16, 12],
-    }),
-    lineHeight: labelProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [22, 16],
-    }),
-  };
+  const labelContainerStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      labelProgress.value,
+      [0, 1],
+      ["#020617", labelBackgroundColor],
+    ),
+    top: interpolate(labelProgress.value, [0, 1], [14, -9]),
+  }));
+
+  const labelTextStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(labelProgress.value, [0, 1], ["#5a7a94", labelColor]),
+    fontSize: interpolate(labelProgress.value, [0, 1], [16, 12]),
+    lineHeight: interpolate(labelProgress.value, [0, 1], [22, 16]),
+  }));
 
   const handleFocus = () => {
     setIsInputFocused(true);

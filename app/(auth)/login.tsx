@@ -17,6 +17,7 @@ import * as yup from "yup";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
 import { Button } from "@/components/ui/my-button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast";
 import { useAuthStore } from "@/stores/auth-store";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
@@ -110,9 +111,9 @@ export default function LoginScreen() {
         backgroundStyle={{ backgroundColor: "#0f172a" }}
         handleIndicatorStyle={{ backgroundColor: "#64748b" }}
       >
-        <BottomSheetView className="flex-1 px-6 pb-8 pt-2">
+        <BottomSheetView className="flex-1 px-6 pt-2 pb-8">
           <View className="gap-3">
-            <Text className="text-xs font-bold uppercase tracking-widest text-green-500">
+            <Text className="text-xs font-bold tracking-widest text-green-500 uppercase">
               Gorhom Demo
             </Text>
             <Text className="text-2xl font-black text-white">
@@ -125,13 +126,15 @@ export default function LoginScreen() {
             </Text>
           </View>
 
-          <View className="mt-8 gap-3">
-            <View className="rounded-xl border border-slate-700 bg-slate-900/70 p-4">
+          <View className="gap-3 mt-8">
+            <View className="p-4 border rounded-xl border-slate-700 bg-slate-900/70">
               <Text className="text-sm font-bold text-white">Snap points</Text>
               <Text className="mt-1 text-sm text-slate-400">45% and 90%</Text>
             </View>
-            <View className="rounded-xl border border-slate-700 bg-slate-900/70 p-4">
-              <Text className="text-sm font-bold text-white">Initial index</Text>
+            <View className="p-4 border rounded-xl border-slate-700 bg-slate-900/70">
+              <Text className="text-sm font-bold text-white">
+                Initial index
+              </Text>
               <Text className="mt-1 text-sm text-slate-400">
                 Opens directly to index 1
               </Text>
@@ -145,23 +148,24 @@ export default function LoginScreen() {
           setFocusedInput(null);
         }}
       >
-        <View className="flex-1 justify-center px-6 py-8">
+        <View className="justify-center flex-1 px-6 py-8">
           {/* Animated gradient accent */}
-          <View className="absolute inset-0 opacity-20 overflow-hidden">
-            <View className="absolute top-20 left-0 w-72 h-72 bg-green-500 rounded-full blur-3xl" />
-            <View className="absolute bottom-40 right-0 w-80 h-80 bg-blue-900 rounded-full blur-3xl" />
+          <View className="absolute inset-0 overflow-hidden opacity-20">
+            <View className="absolute left-0 bg-green-500 rounded-full top-20 w-72 h-72 blur-3xl" />
+            <View className="absolute right-0 bg-blue-900 rounded-full bottom-40 w-80 h-80 blur-3xl" />
           </View>
 
           {/* Content */}
           <View className="relative z-10 gap-8">
             <View className="gap-3">
-              <Text className="text-green-500 text-xs font-bold tracking-widest uppercase">
+              <Text className="text-xs font-bold tracking-widest text-green-500 uppercase">
                 Welcome Back
               </Text>
-              <Text className="text-4xl font-black text-white leading-tight">
+              <Skeleton className="w-full h-12" />
+              <Text className="text-4xl font-black leading-tight text-white">
                 Login
               </Text>
-              <Text className="text-sm text-slate-400 leading-6">
+              <Text className="text-sm leading-6 text-slate-400">
                 Sign in to access your robot dashboard
               </Text>
             </View>
@@ -237,7 +241,7 @@ export default function LoginScreen() {
                 title="Show toast demo"
                 variant="secondary"
                 onPress={() =>
-                  toast.warning(
+                  toast.success(
                     "Toast is ready",
                     "This message can be triggered from any screen.",
                   )
@@ -252,7 +256,7 @@ export default function LoginScreen() {
 
             <View className="gap-4 mt-2">
               <View className="h-px bg-slate-800" />
-              <View className="flex-row gap-2 justify-center items-center">
+              <View className="flex-row items-center justify-center gap-2">
                 <Text className="text-sm font-medium text-slate-400">
                   New here?
                 </Text>

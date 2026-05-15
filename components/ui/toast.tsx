@@ -1,4 +1,10 @@
-import Icon from "@expo/vector-icons/FontAwesome5";
+import {
+  CircleAlert,
+  CircleCheck,
+  CircleX,
+  Info,
+  X,
+} from "lucide-react-native";
 import {
   createContext,
   ReactNode,
@@ -54,7 +60,7 @@ const toastStyles: Record<
   {
     container: string;
     icon: string;
-    iconName: string;
+    Icon: typeof CircleCheck;
     title: string;
     message: string;
   }
@@ -62,28 +68,28 @@ const toastStyles: Record<
   success: {
     container: "border-emerald-500/40 bg-emerald-950",
     icon: "#34d399",
-    iconName: "check-circle",
+    Icon: CircleCheck,
     title: "text-emerald-50",
     message: "text-emerald-100/80",
   },
   error: {
     container: "border-red-500/40 bg-red-950",
     icon: "#f87171",
-    iconName: "times-circle",
+    Icon: CircleX,
     title: "text-red-50",
     message: "text-red-100/80",
   },
   info: {
     container: "border-sky-500/40 bg-sky-950",
     icon: "#38bdf8",
-    iconName: "info-circle",
+    Icon: Info,
     title: "text-sky-50",
     message: "text-sky-100/80",
   },
   warning: {
     container: "border-amber-500/40 bg-amber-950",
     icon: "#fbbf24",
-    iconName: "exclamation-circle",
+    Icon: CircleAlert,
     title: "text-amber-50",
     message: "text-amber-100/80",
   },
@@ -206,6 +212,7 @@ function ToastHost({
   }
 
   const styles = toastStyles[visibleToast.variant];
+  const ToastIcon = styles.Icon;
 
   return (
     <Animated.View
@@ -221,7 +228,7 @@ function ToastHost({
           styles.container,
         )}
       >
-        <Icon name={styles.iconName} size={18} color={styles.icon} />
+        <ToastIcon size={18} color={styles.icon} strokeWidth={2.4} />
         <View className="min-w-0 flex-1">
           <Text className={cn("text-sm font-bold", styles.title)}>
             {visibleToast.title}
@@ -232,7 +239,7 @@ function ToastHost({
             </Text>
           )}
         </View>
-        <Icon name="times" size={14} color="rgba(255,255,255,0.7)" />
+        <X size={14} color="rgba(255,255,255,0.7)" strokeWidth={2.4} />
       </Pressable>
     </Animated.View>
   );

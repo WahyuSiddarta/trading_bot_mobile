@@ -1,3 +1,6 @@
+import "react-native-reanimated";
+import "./global.css";
+
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
@@ -14,10 +17,6 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-import "react-native-ease/nativewind";
-import "react-native-reanimated";
-import "./global.css";
 
 import { ToastProvider } from "@/components/ui/toast";
 import { Colors } from "@/constants/theme";
