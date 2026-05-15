@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabBar, TabView } from "react-native-tab-view";
+
 import { LeaderboardList } from "../leaderboard/profit-leaderboard";
 
 export default function Leaderboard() {
@@ -51,7 +52,6 @@ export default function Leaderboard() {
               }}
               tabStyle={{
                 zIndex: 0,
-
                 minHeight: 44,
               }}
             />

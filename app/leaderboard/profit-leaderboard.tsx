@@ -1,6 +1,7 @@
+import WreathIcon from "@/assets/icon/wreath";
 import { leaderboardMock } from "@/mockresponse/leaderboard";
 import { LinearGradient } from "expo-linear-gradient";
-import { Crown, Medal } from "lucide-react-native";
+import { ChessKing, ChessQueen, Medal } from "lucide-react-native";
 import { ScrollView, Text, View } from "react-native";
 
 type LeaderboardEntry = (typeof leaderboardMock.data)[number];
@@ -25,7 +26,7 @@ const podiumStyles = {
     border: "border-[#F8C847]",
     card: "min-h-[228px]",
     gradient: ["#3A2A08", "#151205", "#07111f"] as const,
-    Icon: Crown,
+    Icon: ChessKing,
     label: "text-[#F8C847]",
     medal: "Gold",
     rank: "bg-[#F8C847]",
@@ -38,7 +39,7 @@ const podiumStyles = {
     border: "border-[#D6DEE8]",
     card: "min-h-[200px]",
     gradient: ["#24313E", "#101A25", "#07111f"] as const,
-    Icon: Medal,
+    Icon: ChessQueen,
     label: "text-[#D6DEE8]",
     medal: "Silver",
     rank: "bg-[#D6DEE8]",
@@ -232,6 +233,7 @@ function LeaderboardRow({
       <View className="flex-row items-center gap-3 px-4 py-3.5 pl-5">
         <RankBadge rank={rank} />
 
+        <WreathIcon width={50} height={50} color={"red"} />
         <View
           className={`h-12 w-12 items-center justify-center rounded-full border ${
             isCurrentUserRow

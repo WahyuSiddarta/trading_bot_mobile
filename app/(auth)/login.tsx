@@ -17,7 +17,6 @@ import * as yup from "yup";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
 import { Button } from "@/components/ui/my-button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast";
 import { useAuthStore } from "@/stores/auth-store";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
@@ -161,7 +160,7 @@ export default function LoginScreen() {
               <Text className="text-xs font-bold tracking-widest text-green-500 uppercase">
                 Welcome Back
               </Text>
-              <Skeleton className="w-full h-12" />
+
               <Text className="text-4xl font-black leading-tight text-white">
                 Login
               </Text>
