@@ -68,7 +68,7 @@ export default function RegisterScreen() {
   const registerMutation = useMutation({
     mutationFn: async (_values: RegisterFormValues) => {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      register();
+      await register();
     },
     onSuccess: () => {
       router.replace("/");

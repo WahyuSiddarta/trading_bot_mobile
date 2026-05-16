@@ -52,12 +52,6 @@ export default function RootLayout() {
     "Inter-BoldItalic": require("../assets/fonts/Inter-BoldItalic.ttf"),
   });
 
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
-
   if (!loaded && !error) {
     return <View />;
   }
@@ -67,12 +61,24 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const hydrateAuth = useAuthStore((state) => state.hydrateAuth);
   const rootNavigationState = useRootNavigationState();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (!rootNavigationState?.key) {
+    hydrateAuth();
+  }, [hydrateAuth]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (!rootNavigationState?.key || isLoading) {
       return;
     }
 
@@ -86,7 +92,7 @@ function RootNavigator() {
     if (isAuthenticated && inAuthGroup) {
       router.replace("/");
     }
-  }, [isAuthenticated, rootNavigationState?.key, router, segments]);
+  }, [isAuthenticated, isLoading, rootNavigationState?.key, router, segments]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -97,10 +103,6 @@ function RootNavigator() {
               <Stack>
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="modal"
-                  options={{ presentation: "modal", title: "Modal" }}
-                />
               </Stack>
               <StatusBar style="light" />
               <PortalHost />

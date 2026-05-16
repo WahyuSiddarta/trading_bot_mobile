@@ -319,7 +319,7 @@ export default function AccountScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-background/90" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-[#0B2D22]" edges={["top"]}>
       <ScrollView
         alwaysBounceVertical
         className="flex-1 bg-background/90"

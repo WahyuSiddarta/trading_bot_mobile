@@ -20,8 +20,10 @@
   --muted-foreground: 205 17% 57%; /* #7d93a5 */
   --accent: 141 44% 16%; /* #173826 */
   --accent-foreground: 156 71% 46%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive: 350 83% 69%; /* #f66f89 */
+  --destructive-foreground: 350 100% 96%;
+  --warning: 40 89% 61%; /* #f4b740 */
+  --warning-foreground: 45 100% 88%;
   --border: 207 60% 18%; /* #123047 */
   --input: 207 60% 18%;
   --ring: 156 71% 46%;

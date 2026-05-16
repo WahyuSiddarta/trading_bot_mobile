@@ -13,6 +13,12 @@ const elevatedSurfaceColor = "#0b1729";
 const textColor = "#e5fff0";
 const mutedColor = "#7d93a5";
 const borderColor = "#123047";
+const dangerColor = "#F66F89";
+const dangerSurfaceColor = "#3A0B18";
+const dangerForegroundColor = "#FFE4E9";
+const warningColor = "#F4B740";
+const warningSurfaceColor = "#251B0A";
+const warningForegroundColor = "#FFF3C4";
 
 export const Colors = {
   light: {
@@ -26,6 +32,12 @@ export const Colors = {
     surface: surfaceColor,
     surfaceElevated: elevatedSurfaceColor,
     border: borderColor,
+    danger: dangerColor,
+    dangerSurface: dangerSurfaceColor,
+    dangerForeground: dangerForegroundColor,
+    warning: warningColor,
+    warningSurface: warningSurfaceColor,
+    warningForeground: warningForegroundColor,
   },
   dark: {
     text: textColor,
@@ -38,6 +50,12 @@ export const Colors = {
     surface: surfaceColor,
     surfaceElevated: elevatedSurfaceColor,
     border: borderColor,
+    danger: dangerColor,
+    dangerSurface: dangerSurfaceColor,
+    dangerForeground: dangerForegroundColor,
+    warning: warningColor,
+    warningSurface: warningSurfaceColor,
+    warningForeground: warningForegroundColor,
   },
 };
 

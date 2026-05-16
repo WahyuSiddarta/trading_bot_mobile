@@ -71,7 +71,7 @@ export default function LoginScreen() {
   const loginMutation = useMutation({
     mutationFn: async (_values: LoginFormValues) => {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      login();
+      await login();
     },
     onSuccess: () => {
       router.replace("/");

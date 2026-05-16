@@ -25,6 +25,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { cn } from "@/lib/utils";
+import { Colors } from "@/constants/theme";
 
 type ToastVariant = "success" | "error" | "info" | "warning";
 
@@ -63,6 +64,8 @@ const toastStyles: Record<
     Icon: typeof CircleCheck;
     title: string;
     message: string;
+    titleColor?: string;
+    messageColor?: string;
   }
 > = {
   success: {
@@ -73,11 +76,11 @@ const toastStyles: Record<
     message: "text-emerald-100/80",
   },
   error: {
-    container: "border-red-500/40 bg-red-950",
-    icon: "#f87171",
+    container: "border-destructive/40 bg-destructive-surface",
+    icon: Colors.dark.danger,
     Icon: CircleX,
-    title: "text-red-50",
-    message: "text-red-100/80",
+    title: "text-destructive-foreground",
+    message: "text-destructive-foreground/80",
   },
   info: {
     container: "border-sky-500/40 bg-sky-950",
@@ -87,11 +90,13 @@ const toastStyles: Record<
     message: "text-sky-100/80",
   },
   warning: {
-    container: "border-amber-500/40 bg-amber-950",
-    icon: "#fbbf24",
+    container: "border-warning/40 bg-warning-surface",
+    icon: Colors.dark.warning,
     Icon: CircleAlert,
-    title: "text-amber-50",
-    message: "text-amber-100/80",
+    title: "",
+    message: "",
+    titleColor: Colors.dark.warningForeground,
+    messageColor: Colors.dark.warningForeground,
   },
 };
 
@@ -230,11 +235,21 @@ function ToastHost({
       >
         <ToastIcon size={18} color={styles.icon} strokeWidth={2.4} />
         <View className="min-w-0 flex-1">
-          <Text className={cn("text-sm font-bold", styles.title)}>
+          <Text
+            className={cn("text-sm font-bold", styles.title)}
+            style={styles.titleColor ? { color: styles.titleColor } : undefined}
+          >
             {visibleToast.title}
           </Text>
           {!!visibleToast.message && (
-            <Text className={cn("mt-1 text-xs leading-5", styles.message)}>
+            <Text
+              className={cn("mt-1 text-xs leading-5", styles.message)}
+              style={
+                styles.messageColor
+                  ? { color: styles.messageColor, opacity: 0.8 }
+                  : undefined
+              }
+            >
               {visibleToast.message}
             </Text>
           )}

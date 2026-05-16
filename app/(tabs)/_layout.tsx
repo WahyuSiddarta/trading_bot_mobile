@@ -11,6 +11,7 @@ import React from "react";
 import { View } from "react-native";
 
 import { HapticTab } from "@/components/haptic-tab";
+import { PrivateAlertStrip } from "@/components/private-alert-strip";
 import { Colors } from "@/constants/theme";
 
 type TabIconProps = {
@@ -37,86 +38,93 @@ function TabIcon({ Icon, color, focused }: TabIconProps) {
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors.dark.tint,
-        tabBarInactiveTintColor: Colors.dark.tabIconDefault,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarStyle: {
-          backgroundColor: Colors.dark.secondaryBackgroundColor,
-          borderTopColor: Colors.dark.border,
-          borderTopWidth: 1,
-          height: 96,
-          paddingTop: 7,
-          paddingBottom: 30,
-          shadowColor: Colors.dark.background,
-          shadowOffset: { width: 0, height: -8 },
-          shadowOpacity: 0.18,
-          shadowRadius: 16,
-          elevation: 12,
-        },
-        tabBarItemStyle: {
-          paddingVertical: 3,
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: "700",
-          marginTop: 9,
-        },
-        tabBarIconStyle: {
-          marginTop: 1,
-        },
-        sceneStyle: {
-          backgroundColor: Colors.dark.background,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={House} color={color} focused={focused} />
-          ),
+    <View className="flex-1 bg-background">
+      <PrivateAlertStrip />
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors.dark.tint,
+          tabBarInactiveTintColor: Colors.dark.tabIconDefault,
+          headerShown: false,
+          tabBarButton: HapticTab,
+          tabBarStyle: {
+            backgroundColor: Colors.dark.secondaryBackgroundColor,
+            borderTopColor: Colors.dark.border,
+            borderTopWidth: 1,
+            height: 96,
+            paddingTop: 7,
+            paddingBottom: 30,
+            shadowColor: Colors.dark.background,
+            shadowOffset: { width: 0, height: -8 },
+            shadowOpacity: 0.18,
+            shadowRadius: 16,
+            elevation: 12,
+          },
+          tabBarItemStyle: {
+            paddingVertical: 3,
+          },
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontWeight: "700",
+            marginTop: 9,
+          },
+          tabBarIconStyle: {
+            marginTop: 1,
+          },
+          sceneStyle: {
+            backgroundColor: Colors.dark.background,
+          },
         }}
-      />
-      <Tabs.Screen
-        name="signals"
-        options={{
-          title: "Signals",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={ChartCandlestick} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="leaderboard"
-        options={{
-          title: "Rank",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={Medal} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="wallet"
-        options={{
-          title: "Wallet",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={Wallet} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="account"
-        options={{
-          title: "Account",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={CircleUserRound} color={color} focused={focused} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={House} color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="signals"
+          options={{
+            title: "Signals",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                Icon={ChartCandlestick}
+                color={color}
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="leaderboard"
+          options={{
+            title: "Rank",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={Medal} color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="wallet"
+          options={{
+            title: "Wallet",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={Wallet} color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="account"
+          options={{
+            title: "Account",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={CircleUserRound} color={color} focused={focused} />
+            ),
+          }}
+        />
+      </Tabs>
+    </View>
   );
 }
