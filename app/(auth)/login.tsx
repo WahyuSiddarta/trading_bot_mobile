@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Keyboard,
@@ -17,9 +17,7 @@ import * as yup from "yup";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
 import { Button } from "@/components/ui/my-button";
-import { useToast } from "@/components/ui/toast";
 import { useAuthStore } from "@/stores/auth-store";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 
 const loginSchema = yup.object({
   email: yup
@@ -50,7 +48,7 @@ function isLoginFieldValid(
 export default function LoginScreen() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
-  const toast = useToast();
+
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   const {
@@ -82,18 +80,6 @@ export default function LoginScreen() {
     loginMutation.mutate(values);
   });
 
-  // ref
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const bottomSheetSnapPoints = useMemo(() => ["45%", "90%"], []);
-
-  // callbacks
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
-
   return (
     <LinearGradient
       colors={["#01040a", "#0a1620", "#01040a"]}
@@ -101,46 +87,6 @@ export default function LoginScreen() {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <BottomSheetModal
-        ref={bottomSheetModalRef}
-        index={1}
-        snapPoints={bottomSheetSnapPoints}
-        enableDynamicSizing={false}
-        onChange={handleSheetChanges}
-        backgroundStyle={{ backgroundColor: "#0f172a" }}
-        handleIndicatorStyle={{ backgroundColor: "#64748b" }}
-      >
-        <BottomSheetView className="flex-1 px-6 pt-2 pb-8">
-          <View className="gap-3">
-            <Text className="text-xs font-bold tracking-widest text-green-500 uppercase">
-              Gorhom Demo
-            </Text>
-            <Text className="text-2xl font-black text-white">
-              Bottom sheet is fully open
-            </Text>
-            <Text className="text-sm leading-6 text-slate-300">
-              This demo uses explicit snap points, starts at the larger snap
-              point, and disables dynamic sizing so the sheet can expand to the
-              intended height.
-            </Text>
-          </View>
-
-          <View className="gap-3 mt-8">
-            <View className="p-4 border rounded-xl border-slate-700 bg-slate-900/70">
-              <Text className="text-sm font-bold text-white">Snap points</Text>
-              <Text className="mt-1 text-sm text-slate-400">45% and 90%</Text>
-            </View>
-            <View className="p-4 border rounded-xl border-slate-700 bg-slate-900/70">
-              <Text className="text-sm font-bold text-white">
-                Initial index
-              </Text>
-              <Text className="mt-1 text-sm text-slate-400">
-                Opens directly to index 1
-              </Text>
-            </View>
-          </View>
-        </BottomSheetView>
-      </BottomSheetModal>
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
@@ -234,22 +180,6 @@ export default function LoginScreen() {
                 loading={loginMutation.isPending}
                 className="mt-4"
                 size="lg"
-              />
-
-              <Button
-                title="Show toast demo"
-                variant="secondary"
-                onPress={() =>
-                  toast.success(
-                    "Toast is ready",
-                    "This message can be triggered from any screen.",
-                  )
-                }
-              />
-              <Button
-                title="Show gorhum demo"
-                variant="secondary"
-                onPress={handlePresentModalPress}
               />
             </View>
 

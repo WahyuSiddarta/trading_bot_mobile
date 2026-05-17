@@ -76,18 +76,18 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="index"
+          name="leaderboard"
           options={{
-            title: "Home",
+            title: "Rank",
             tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={House} color={color} focused={focused} />
+              <TabIcon Icon={Medal} color={color} focused={focused} />
             ),
           }}
         />
         <Tabs.Screen
           name="signals"
           options={{
-            title: "Signals",
+            title: "Services",
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
                 Icon={ChartCandlestick}
@@ -98,11 +98,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="leaderboard"
+          name="index"
           options={{
-            title: "Rank",
+            title: "Home",
             tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={Medal} color={color} focused={focused} />
+              <TabIcon Icon={House} color={color} focused={focused} />
             ),
           }}
         />

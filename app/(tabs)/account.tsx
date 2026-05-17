@@ -1,3 +1,4 @@
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import {
   Bell,
@@ -24,8 +25,11 @@ import {
   Wallet,
   type LucideIcon,
 } from "lucide-react-native";
+import { useCallback } from "react";
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { useToast } from "@/components/ui/toast";
 
 const profitResponse = {
   code: "DATA_PROFIT_RETRIEVED",
@@ -198,7 +202,13 @@ function PushNotificationRow({ enabled }: { enabled: boolean }) {
   );
 }
 
-function ReferralRow({ onPress }: { onPress: () => void }) {
+function ReferralRow({
+  onCopy,
+  onPress,
+}: {
+  onCopy: () => void;
+  onPress: () => void;
+}) {
   return (
     <Pressable
       className="flex-row items-center gap-3 py-2.5 active:opacity-70"
@@ -216,7 +226,13 @@ function ReferralRow({ onPress }: { onPress: () => void }) {
         </Text>
       </View>
       <View className="flex-row items-center gap-2">
-        <Pressable className="flex-row items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 active:opacity-70">
+        <Pressable
+          className="flex-row items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 active:opacity-70"
+          onPress={(event) => {
+            event.stopPropagation();
+            onCopy();
+          }}
+        >
           <Copy size={14} color="#22C986" strokeWidth={2.5} />
           <Text className="text-xs font-bold text-primary">Copy</Text>
         </Pressable>
@@ -317,6 +333,12 @@ function AppVersionRow() {
 
 export default function AccountScreen() {
   const router = useRouter();
+  const toast = useToast();
+
+  const handleCopyReferralCode = useCallback(async () => {
+    await Clipboard.setStringAsync(referralCode);
+    toast.info("Referral code copied", referralCode);
+  }, [toast]);
 
   return (
     <SafeAreaView className="flex-1 bg-[#0B2D22]" edges={["top"]}>
@@ -413,7 +435,10 @@ export default function AccountScreen() {
             <View className="h-px bg-border/70" />
             <MenuRow {...telegramSetting} />
             <View className="h-px bg-border/70" />
-            <ReferralRow onPress={() => router.push("/leaderboard")} />
+            <ReferralRow
+              onCopy={handleCopyReferralCode}
+              onPress={() => router.push("/leaderboard")}
+            />
             <View className="h-px bg-border/70" />
             <MenuRow
               Icon={KeyRound}

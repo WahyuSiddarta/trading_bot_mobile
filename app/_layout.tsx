@@ -43,6 +43,8 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const hydrateAuth = useAuthStore((state) => state.hydrateAuth);
   const [loaded, error] = useFonts({
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
     "Inter-Medium": require("../assets/fonts/Inter-Medium.ttf"),
@@ -51,8 +53,25 @@ export default function RootLayout() {
     "Inter-Italic": require("../assets/fonts/Inter-Italic.ttf"),
     "Inter-BoldItalic": require("../assets/fonts/Inter-BoldItalic.ttf"),
   });
+  const isFontReady = loaded || Boolean(error);
 
-  if (!loaded && !error) {
+  useEffect(() => {
+    if (error) {
+      console.warn("Font loading failed. Continuing with fallback fonts.", error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    hydrateAuth();
+  }, [hydrateAuth]);
+
+  useEffect(() => {
+    if (isFontReady && !isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isFontReady, isLoading]);
+
+  if (!isFontReady || isLoading) {
     return <View />;
   }
 
@@ -62,20 +81,9 @@ export default function RootLayout() {
 function RootNavigator() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
-  const hydrateAuth = useAuthStore((state) => state.hydrateAuth);
   const rootNavigationState = useRootNavigationState();
   const segments = useSegments();
   const router = useRouter();
-
-  useEffect(() => {
-    hydrateAuth();
-  }, [hydrateAuth]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      SplashScreen.hideAsync();
-    }
-  }, [isLoading]);
 
   useEffect(() => {
     if (!rootNavigationState?.key || isLoading) {
@@ -104,7 +112,7 @@ function RootNavigator() {
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               </Stack>
-              <StatusBar style="light" />
+              <StatusBar style="auto" />
               <PortalHost />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>

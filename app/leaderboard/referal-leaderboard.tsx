@@ -377,7 +377,6 @@ export function ReferralLeaderboard() {
     simulateFetch(true);
   }, [simulateFetch]);
 
-  const [activeTab, setActiveTab] = useState("daily");
   return (
     <ScrollView
       className="flex-1 bg-background"
