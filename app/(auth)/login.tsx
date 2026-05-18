@@ -26,7 +26,6 @@ import config from "@/config";
 import { hashPassword } from "@/lib/crypto";
 import { useAuthStore } from "@/stores/auth-store";
 import { errorMessages } from "@/utils/error";
-import { fetchWrapper } from "@/utils/fetcher";
 
 const RECAPTCHA_SITE_KEY = config.RECAPTCHA_KEY;
 const RECAPTCHA_BASE_URL = config.BASE_URL;
@@ -58,7 +57,47 @@ type LoginPayload = {
 
 async function loginApi(payload: LoginPayload) {
   console.log("Login API called with payload:", payload);
-  return fetchWrapper.postPublic("/api/public/login", payload);
+  const mockupFetching = async () => {
+    const delay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+
+    const mockOrder = {
+      acl: [
+        "page_setting",
+        "page_info",
+        "page_dashboard",
+        "page_market",
+        "page_order",
+        "page_position",
+        "page_profit",
+        "page_api",
+        "page_gas",
+        "page_bonus",
+        "page_referral",
+        "act_wd",
+        "act_wd_wallet",
+        "page_leaderboard",
+      ],
+      activated: true,
+      code: "LOGIN_SUCCESS",
+      elapsed: 0.100223696,
+      email: "tatastail+2crispytrade@gmail.com",
+      expired: 1779365974000,
+      referral: "FFEC2715662D795C",
+      status: "OK",
+      token:
+        "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjowLCJ1c2VyX2lkIjoiZmFmMGRmNzUtNGM5YS00OGRiLWFiMTctNmM1MDljZjU3MzViIiwiaXNzIjoiQ3Jpc3B5VHJhZGUiLCJzdWIiOiJjcnlwdG90cmFkaW5nMDk5IiwiYXVkIjpbInRhdGFzdGFpbCsyY3Jpc3B5dHJhZGVAZ21haWwuY29tIl0sImV4cCI6MTc3OTM2NTk3NCwibmJmIjoxNzc5MTA2Nzc0LCJpYXQiOjE3NzkxMDY3NzR9.zeapiMGyecw-zAAhtBfGlezn_UFRVVPnL_QvNGm1pyfVwV7PFkAp81GccuFjtOKsdhPmc5aggs0Xqfq51mdJgg",
+      user_id: "faf0df75-4c9a-48db-ab17-6c509cf5735b",
+      username: "stail002",
+    };
+
+    // Simulate network latency without blocking the main thread.
+    await delay(3);
+
+    return Promise.resolve(mockOrder);
+  };
+  return mockupFetching();
+  // return fetchWrapper.postPublic("/api/public/login", payload);
 }
 
 function isLoginFieldValid(
@@ -188,8 +227,8 @@ export default function LoginScreen() {
                 name="email"
                 render={({ field: { onBlur, onChange, value } }) => (
                   <FormTextInput
-                    label="Email"
-                    placeholder="Enter your email"
+                    label="Email / Username"
+                    placeholder="Enter your email / username"
                     value={value}
                     onChange={onChange}
                     onFocus={() => setFocusedInput("email")}

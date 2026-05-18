@@ -83,11 +83,6 @@ export function FormNumberInput({
     top: interpolate(labelProgress.value, [0, 1], [14, -9]),
   }));
   const labelTextStyle = useAnimatedStyle(() => ({
-    color: interpolateColor(
-      labelProgress.value,
-      [0, 1],
-      ["#5a7a94", labelColor],
-    ),
     fontSize: interpolate(labelProgress.value, [0, 1], [16, 12]),
     lineHeight: interpolate(labelProgress.value, [0, 1], [22, 16]),
   }));
@@ -111,7 +106,11 @@ export function FormNumberInput({
             pointerEvents="none"
             style={labelContainerStyle}
           >
-            <Animated.Text className="font-medium" style={labelTextStyle}>
+            <Animated.Text
+              className="font-medium"
+              numberOfLines={1}
+              style={[labelTextStyle, { color: labelColor }]}
+            >
               {label}
             </Animated.Text>
             {required && <Text className="font-bold text-red-400">*</Text>}

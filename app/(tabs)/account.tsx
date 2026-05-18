@@ -25,11 +25,19 @@ import {
   Wallet,
   type LucideIcon,
 } from "lucide-react-native";
-import { useCallback } from "react";
-import { Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useToast } from "@/components/ui/toast";
+import { useAuthStore } from "@/stores/auth-store";
 
 const profitResponse = {
   code: "DATA_PROFIT_RETRIEVED",
@@ -334,11 +342,28 @@ function AppVersionRow() {
 export default function AccountScreen() {
   const router = useRouter();
   const toast = useToast();
+  const logout = useAuthStore((state) => state.logout);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleCopyReferralCode = useCallback(async () => {
     await Clipboard.setStringAsync(referralCode);
     toast.info("Referral code copied", referralCode);
   }, [toast]);
+
+  const handleLogout = useCallback(async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+    } catch (error) {
+      setIsLoggingOut(false);
+      toast.error("Logout failed", "Please try again.");
+    }
+  }, [isLoggingOut, logout, toast]);
 
   return (
     <SafeAreaView className="flex-1 bg-[#0B2D22]" edges={["top"]}>
@@ -471,17 +496,29 @@ export default function AccountScreen() {
         </View>
 
         <View className="px-5 mt-5">
-          <Pressable className="flex-row items-center gap-3 px-4 py-3 border border-red-500/20 rounded-2xl bg-red-500/10 active:opacity-70">
+          <Pressable
+            className={`flex-row items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 active:opacity-70 ${
+              isLoggingOut ? "opacity-60" : ""
+            }`}
+            disabled={isLoggingOut}
+            onPress={handleLogout}
+          >
             <View className="items-center justify-center border rounded-md h-9 w-9 border-red-500/25 bg-red-500/10">
               <LogOut size={18} color="#F87171" strokeWidth={2.4} />
             </View>
             <View className="flex-1">
-              <Text className="text-sm font-semibold text-red-300">Logout</Text>
+              <Text className="text-sm font-semibold text-red-300">
+                {isLoggingOut ? "Logging out" : "Logout"}
+              </Text>
               <Text className="mt-0.5 text-xs text-red-200/70">
                 Sign out from this device
               </Text>
             </View>
-            <ChevronRight size={19} color="#F87171" strokeWidth={2.4} />
+            {isLoggingOut ? (
+              <ActivityIndicator color="#F87171" size="small" />
+            ) : (
+              <ChevronRight size={19} color="#F87171" strokeWidth={2.4} />
+            )}
           </Pressable>
         </View>
       </ScrollView>

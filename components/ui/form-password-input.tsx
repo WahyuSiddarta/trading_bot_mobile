@@ -82,11 +82,6 @@ export function FormPasswordInput({
     top: interpolate(labelProgress.value, [0, 1], [14, -9]),
   }));
   const labelTextStyle = useAnimatedStyle(() => ({
-    color: interpolateColor(
-      labelProgress.value,
-      [0, 1],
-      ["#5a7a94", labelColor],
-    ),
     fontSize: interpolate(labelProgress.value, [0, 1], [16, 12]),
     lineHeight: interpolate(labelProgress.value, [0, 1], [22, 16]),
   }));
@@ -118,7 +113,11 @@ export function FormPasswordInput({
             pointerEvents="none"
             style={labelContainerStyle}
           >
-            <Animated.Text className="font-medium" style={labelTextStyle}>
+            <Animated.Text
+              className="font-medium"
+              numberOfLines={1}
+              style={[labelTextStyle, { color: labelColor }]}
+            >
               {label}
             </Animated.Text>
             {required && <Text className="font-bold text-red-400">*</Text>}
@@ -144,11 +143,7 @@ export function FormPasswordInput({
           accessibilityLabel={showPassword ? "Hide password" : "Show password"}
           className="items-center justify-center w-10 h-10 ml-2 rounded-full active:bg-slate-800/70 disabled:opacity-50"
         >
-          <PasswordIcon
-            size={20}
-            color={passwordIconColor}
-            strokeWidth={2.2}
-          />
+          <PasswordIcon size={20} color={passwordIconColor} strokeWidth={2.2} />
         </Pressable>
       </View>
       {error && (
