@@ -25,43 +25,43 @@ const routes: { key: LeaderboardPeriod; title: string }[] = [
 const leaderboardEntries = leaderboardMock.data;
 const podiumStyles = {
   1: {
-    accent: "#F8C847",
-    avatar: "border-[#F8C847] bg-[#F8C847]/20",
-    base: "h-24",
-    baseText: "text-[#2B1B03]",
-    border: "border-[#F8C847]",
-    gradient: ["#3A2A08", "#151205", "#07111f"] as const,
+    accent: "#D7B46A",
+    avatar: "border-[#D7B46A]/70 bg-[#D7B46A]/12",
+    base: "h-16",
+    baseText: "text-[#221A0B]",
+    border: "border-[#D7B46A]/45",
+    gradient: ["#1C1A15", "#111923", "#07111F"] as const,
     Icon: ChessKing,
-    label: "text-[#F8C847]",
+    label: "text-[#D7B46A]",
     medal: "Gold",
-    rank: "bg-[#F8C847]",
-    text: "text-[#F8C847]",
+    rank: "bg-[#D7B46A]",
+    text: "text-[#D7B46A]",
   },
   2: {
-    accent: "#D6DEE8",
-    avatar: "border-[#D6DEE8] bg-[#D6DEE8]/15",
-    base: "h-16",
+    accent: "#A7B0BD",
+    avatar: "border-[#A7B0BD]/60 bg-[#A7B0BD]/10",
+    base: "h-12",
     baseText: "text-[#172231]",
-    border: "border-[#D6DEE8]",
-    gradient: ["#24313E", "#101A25", "#07111f"] as const,
+    border: "border-[#A7B0BD]/40",
+    gradient: ["#1A2330", "#101923", "#07111F"] as const,
     Icon: ChessQueen,
-    label: "text-[#D6DEE8]",
+    label: "text-[#A7B0BD]",
     medal: "Silver",
-    rank: "bg-[#D6DEE8]",
-    text: "text-[#D6DEE8]",
+    rank: "bg-[#A7B0BD]",
+    text: "text-[#A7B0BD]",
   },
   3: {
-    accent: "#C9784B",
-    avatar: "border-[#C9784B] bg-[#C9784B]/15",
-    base: "h-12",
+    accent: "#B48162",
+    avatar: "border-[#B48162]/55 bg-[#B48162]/10",
+    base: "h-10",
     baseText: "text-[#21100A]",
-    border: "border-[#C9784B]",
-    gradient: ["#3A2014", "#160F0C", "#07111f"] as const,
+    border: "border-[#B48162]/40",
+    gradient: ["#201A16", "#111923", "#07111F"] as const,
     Icon: Medal,
-    label: "text-[#C9784B]",
+    label: "text-[#B48162]",
     medal: "Bronze",
-    rank: "bg-[#C9784B]",
-    text: "text-[#C9784B]",
+    rank: "bg-[#B48162]",
+    text: "text-[#B48162]",
   },
 } as const;
 
@@ -70,14 +70,14 @@ function ProfitPill({ profit }: { profit: number }) {
 
   return (
     <View
-      className={`items-end rounded-full border px-3 py-1.5 ${
+      className={`items-end rounded-full border px-2.5 py-1 ${
         isPositive
           ? "border-primary/20 bg-primary/15"
           : "border-border bg-secondary"
       }`}
     >
       <Text
-        className={`font-semibold text-xs ${
+        className={`font-semibold text-[11px] ${
           isPositive ? "text-primary" : "text-muted-foreground"
         }`}
       >
@@ -99,24 +99,24 @@ function PodiumCard({
   const isCurrentUserPodium = isCurrentUser(entry);
   const podiumStyle = podiumStyles[rank];
   const PodiumIcon = podiumStyle.Icon;
-  const wreathSize = featured ? 78 : 68;
+  const wreathSize = featured ? 58 : 50;
 
   return (
     <View className="justify-end flex-1">
       <LinearGradient
-        className={`overflow-hidden rounded-t-xl border border-b-0 ${podiumStyle.border}`}
+        className={`overflow-hidden rounded-t-lg border border-b-0 ${podiumStyle.border}`}
         colors={podiumStyle.gradient}
         end={{ x: 1, y: 1 }}
         start={{ x: 0, y: 0 }}
         style={{
-          elevation: featured ? 10 : 5,
+          elevation: featured ? 5 : 3,
           shadowColor: podiumStyle.accent,
-          shadowOffset: { width: 0, height: featured ? 10 : 6 },
-          shadowOpacity: featured ? 0.24 : 0.14,
-          shadowRadius: featured ? 18 : 12,
+          shadowOffset: { width: 0, height: featured ? 6 : 4 },
+          shadowOpacity: featured ? 0.16 : 0.1,
+          shadowRadius: featured ? 12 : 8,
         }}
       >
-        <View className="absolute top-0 left-0 right-0 h-12 opacity-30">
+        <View className="absolute top-0 left-0 right-0 h-8 opacity-20">
           <LinearGradient
             className="h-full"
             colors={[podiumStyle.accent, "transparent"]}
@@ -128,21 +128,21 @@ function PodiumCard({
         <View className="absolute right-2 top-2">
           <PodiumIcon
             color={podiumStyle.accent}
-            size={featured ? 22 : 18}
+            size={featured ? 18 : 16}
             strokeWidth={2.3}
           />
         </View>
 
-        <View className="items-center px-2 pt-3 pb-3">
+        <View className="items-center px-2 pt-2 pb-2.5">
           {isCurrentUserPodium ? (
-            <View className="absolute left-2 top-2 rounded-full border border-primary bg-primary px-2 py-0.5">
+            <View className="absolute left-2 top-2 rounded-full border border-primary/70 bg-primary/90 px-1.5 py-0.5">
               <Text className="font-bold text-[10px] text-primary-foreground">
                 YOU
               </Text>
             </View>
           ) : null}
 
-          <View className="items-center justify-center mb-2">
+          <View className="items-center justify-center mb-1.5">
             <WreathIcon
               color={podiumStyle.accent}
               height={wreathSize}
@@ -152,12 +152,14 @@ function PodiumCard({
           </View>
 
           <Text
-            className="max-w-full text-sm font-semibold text-white"
+            className="max-w-full text-xs font-semibold text-white"
             numberOfLines={1}
           >
             {entry.username}
           </Text>
-          <Text className={`mb-2 font-medium text-[11px] ${podiumStyle.label}`}>
+          <Text
+            className={`mb-1.5 font-medium text-[10px] ${podiumStyle.label}`}
+          >
             {podiumStyle.medal}
           </Text>
           <ProfitPill profit={entry.profit} />
@@ -165,15 +167,15 @@ function PodiumCard({
       </LinearGradient>
 
       <View
-        className={`items-center justify-center rounded-xl ${podiumStyle.rank} ${podiumStyle.base}`}
+        className={`items-center justify-center rounded-lg ${podiumStyle.rank} ${podiumStyle.base}`}
         style={{
           shadowColor: podiumStyle.accent,
-          shadowOffset: { width: 0, height: 7 },
-          shadowOpacity: 0.2,
-          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.12,
+          shadowRadius: 8,
         }}
       >
-        <Text className={`text-3xl font-black ${podiumStyle.baseText}`}>
+        <Text className={`text-xl font-black ${podiumStyle.baseText}`}>
           #{rank}
         </Text>
       </View>
@@ -192,11 +194,11 @@ function LeaderboardRow({
   const podiumRowStyle =
     rank <= 3 ? podiumStyles[rank as PodiumRank] : undefined;
   const rowAccent =
-    podiumRowStyle?.accent ?? (isCurrentUserRow ? "#3CFF88" : "#C9784B");
+    podiumRowStyle?.accent ?? (isCurrentUserRow ? "#22C986" : "#8DA0B6");
   const wreathColor = rowAccent;
   const rankColor =
     podiumRowStyle?.text ??
-    (isCurrentUserRow ? "text-primary" : "text-[#F3C36B]");
+    (isCurrentUserRow ? "text-primary" : "text-[#A8B6C8]");
 
   const rowGradient = podiumRowStyle
     ? podiumRowStyle.gradient
@@ -217,12 +219,12 @@ function LeaderboardRow({
       start={{ x: 0, y: 0 }}
       style={{
         shadowColor: rowAccent,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: podiumRowStyle ? 0.16 : isCurrentUserRow ? 0.18 : 0.1,
-        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: podiumRowStyle ? 0.1 : isCurrentUserRow ? 0.12 : 0.06,
+        shadowRadius: 8,
       }}
     >
-      <View className="absolute top-0 right-0 w-24 h-full opacity-20">
+      <View className="absolute top-0 right-0 w-16 h-full opacity-10">
         <LinearGradient
           className="h-full"
           colors={[wreathColor, "transparent"]}
@@ -231,34 +233,31 @@ function LeaderboardRow({
         />
       </View>
 
-      <View className="flex-row items-center gap-3 px-3 py-1">
-        <View className="items-center w-12">
-          <Text className={`text-xs font-bold uppercase ${rankColor}`}>
+      <View className="flex-row items-center gap-2.5 px-3 py-2">
+        <View className="items-center w-14">
+          <Text className={`text-[10px] font-bold uppercase ${rankColor}`}>
             {podiumRowStyle?.medal ?? "Rank"}
           </Text>
-          <Text className={`mt-0.5 text-lg font-extrabold ${rankColor}`}>
+          <Text className={`mt-0.5 text-base font-extrabold ${rankColor}`}>
             #{rank}
           </Text>
         </View>
 
-        <View className="items-center justify-center w-16 h-16">
+        <View className="items-center justify-center w-11 h-11">
           <WreathIcon
-            width={64}
-            height={64}
+            width={44}
+            height={44}
             color={wreathColor}
             opacity={isCurrentUserRow ? 0.9 : 0.72}
           />
         </View>
 
         <View className="flex-1 min-w-0">
-          <Text
-            className="text-base font-semibold text-white"
-            numberOfLines={1}
-          >
+          <Text className="text-sm font-semibold text-white" numberOfLines={1}>
             {entry.username}
           </Text>
           <Text
-            className={`mt-1 font-medium text-xs ${
+            className={`mt-0.5 font-medium text-[11px] ${
               isCurrentUserRow ? "text-primary" : "text-[#A9B8C8]"
             }`}
           >
@@ -277,15 +276,15 @@ function PodiumSkeleton() {
     <View className="flex-row items-end gap-3">
       {[2, 1, 3].map((rank) => (
         <View className="justify-end flex-1" key={rank}>
-          <View className="items-center px-2 pt-3 pb-3 border border-b-0 rounded-t-xl border-border bg-card">
-            <Skeleton className="w-16 h-16 mb-2 rounded-full" />
-            <Skeleton className="w-16 h-3 mb-2" />
-            <Skeleton className="mb-2 h-2.5 w-10" />
-            <Skeleton className="w-20 rounded-full h-7" />
+          <View className="items-center px-2 pt-2 pb-2.5 border border-b-0 rounded-t-lg border-border bg-card">
+            <Skeleton className="w-12 h-12 mb-1.5 rounded-full" />
+            <Skeleton className="w-14 h-3 mb-1.5" />
+            <Skeleton className="mb-1.5 h-2.5 w-9" />
+            <Skeleton className="h-6 rounded-full w-[72px]" />
           </View>
           <Skeleton
-            className={`rounded-b-xl ${
-              rank === 1 ? "h-24" : rank === 2 ? "h-16" : "h-12"
+            className={`rounded-b-lg ${
+              rank === 1 ? "h-16" : rank === 2 ? "h-12" : "h-10"
             }`}
           />
         </View>
@@ -296,21 +295,21 @@ function PodiumSkeleton() {
 
 function LeaderboardRowSkeleton() {
   return (
-    <View className="overflow-hidden border rounded-xl border-border bg-card">
-      <View className="flex-row items-center gap-3 px-3 py-1">
-        <View className="items-center w-12">
-          <Skeleton className="h-3 mb-1 w-9" />
-          <Skeleton className="w-8 h-5" />
+    <View className="overflow-hidden border rounded-lg border-border bg-card">
+      <View className="flex-row items-center gap-2.5 px-3 py-2">
+        <View className="items-center w-10">
+          <Skeleton className="h-2.5 mb-1 w-8" />
+          <Skeleton className="h-4 w-7" />
         </View>
 
-        <Skeleton className="w-16 h-16 rounded-full" />
+        <Skeleton className="rounded-full w-11 h-11" />
 
         <View className="flex-1">
-          <Skeleton className="h-4 mb-2 w-28" />
-          <Skeleton className="w-20 h-3" />
+          <Skeleton className="h-3.5 mb-2 w-24" />
+          <Skeleton className="h-2.5 w-16" />
         </View>
 
-        <Skeleton className="w-20 rounded-full h-7" />
+        <Skeleton className="h-6 rounded-full w-[72px]" />
       </View>
     </View>
   );
@@ -364,7 +363,7 @@ export function LeaderboardList() {
         />
       }
     >
-      <View className="px-5 pt-4">
+      <View className="px-4 pt-3">
         <AnimatedTabs
           items={[
             { label: "Daily", value: "daily" },
@@ -376,13 +375,13 @@ export function LeaderboardList() {
           maxPerRow={3}
         />
       </View>
-      <View className="px-5 pt-4">
-        <View className="flex-row items-end justify-between mb-4">
+      <View className="px-4 pt-3">
+        <View className="flex-row items-end justify-between mb-3">
           <View>
-            <Text className="text-xs font-bold tracking-widest uppercase text-primary">
+            <Text className="text-[11px] font-bold uppercase text-primary">
               Top Traders
             </Text>
-            <Text className="mt-1 text-2xl font-bold tracking-tighter text-white">
+            <Text className="mt-0.5 text-lg font-bold text-white">
               Profit Leaderboard
             </Text>
           </View>
@@ -391,7 +390,7 @@ export function LeaderboardList() {
         {isLoading ? (
           <PodiumSkeleton />
         ) : (
-          <View className="flex-row items-end gap-3">
+          <View className="flex-row items-end gap-2.5">
             {orderedPodium.map((podiumItem) => (
               <PodiumCard
                 entry={podiumItem.entry}
@@ -403,7 +402,7 @@ export function LeaderboardList() {
           </View>
         )}
       </View>
-      <View className="gap-3 px-5 pt-6 pb-6">
+      <View className="gap-2.5 px-4 pt-4 pb-6">
         {isLoading
           ? Array.from({ length: 6 }, (_, index) => (
               <LeaderboardRowSkeleton key={index} />

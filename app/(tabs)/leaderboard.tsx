@@ -27,7 +27,7 @@ export default function Leaderboard() {
           commonOptions={{
             labelStyle: {
               fontFamily: "Inter-SemiBold",
-              fontSize: 13,
+              fontSize: 12,
             },
           }}
           initialLayout={{ width: layout.width }}
@@ -48,7 +48,7 @@ export default function Leaderboard() {
               indicatorStyle={{
                 backgroundColor: Colors.dark.tint,
                 borderRadius: 999,
-                height: 3,
+                height: 2,
               }}
               pressColor="rgba(34, 201, 134, 0.12)"
               style={{
@@ -58,7 +58,7 @@ export default function Leaderboard() {
               }}
               tabStyle={{
                 zIndex: 0,
-                minHeight: 44,
+                minHeight: 40,
               }}
             />
           )}
