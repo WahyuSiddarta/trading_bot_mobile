@@ -20,7 +20,7 @@ export type ApiKeyResponse = {
   status: string;
 };
 
-export const apiKeyMock: ApiKeyResponse = {
+const apiKeyResponse: ApiKeyResponse = {
   code: "DATA_API_RETRIEVED",
   data: [
     {
@@ -55,7 +55,7 @@ export const apiKeyMock: ApiKeyResponse = {
   status: "OK",
 };
 
-export async function fetchApiKeysMock() {
+export async function fetchApiKeys() {
   await new Promise((resolve) => setTimeout(resolve, 250));
-  return apiKeyMock;
+  return apiKeyResponse;
 }

@@ -112,7 +112,6 @@ function PodiumCard({
   const isCurrentUserPodium = isCurrentUser(entry);
   const podiumStyle = podiumStyles[rank];
   const PodiumIcon = podiumStyle.Icon;
-  const avatarSize = featured ? 66 : 58;
   const wreathSize = featured ? 78 : 68;
 
   return (
@@ -211,11 +210,7 @@ function LeaderboardRow({
   const rankColor =
     podiumRowStyle?.text ??
     (isCurrentUserRow ? "text-primary" : "text-[#F3C36B]");
-  const avatarClassName =
-    podiumRowStyle?.avatar ??
-    (isCurrentUserRow
-      ? "border-primary/80 bg-primary/20"
-      : "border-[#C9784B]/50 bg-[#271D18]");
+
   const rowGradient = podiumRowStyle
     ? podiumRowStyle.gradient
     : isCurrentUserRow

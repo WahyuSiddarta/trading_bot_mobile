@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchApiKeysMock } from "@/mockresponse/api-key";
+import { fetchApiKeys } from "@/api/api-keys";
 import {
   fetchAnnouncements,
   fetchTelegramLinkCode,
@@ -37,6 +37,6 @@ export function useAnnouncementsQuery() {
 export function useApiKeysQuery() {
   return useQuery({
     queryKey: ["api-keys"],
-    queryFn: fetchApiKeysMock,
+    queryFn: fetchApiKeys,
   });
 }

@@ -7,14 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 
 type LeaderboardEntry = (typeof leaderboardMock.data)[number];
-type LeaderboardPeriod = "daily" | "weekly" | "monthly";
 type PodiumRank = 1 | 2 | 3;
-
-const routes: { key: LeaderboardPeriod; title: string }[] = [
-  { key: "daily", title: "Daily" },
-  { key: "weekly", title: "Weekly" },
-  { key: "monthly", title: "Monthly" },
-];
 
 const leaderboardEntries = leaderboardMock.data;
 const currentUserMock = {
@@ -111,7 +104,6 @@ function PodiumCard({
   const isCurrentUserPodium = isCurrentUser(entry);
   const podiumStyle = podiumStyles[rank];
   const PodiumIcon = podiumStyle.Icon;
-  const avatarSize = featured ? 66 : 58;
   const wreathSize = featured ? 78 : 68;
 
   return (

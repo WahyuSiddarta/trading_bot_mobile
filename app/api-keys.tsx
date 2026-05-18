@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useToast } from "@/components/ui/toast";
 import { exchanger_master_data } from "@/constant/exchanger";
 import { useApiKeysQuery } from "@/hooks/use-query";
-import type { ApiKeyItem, ApiServerItem } from "@/mockresponse/api-key";
+import type { ApiKeyItem, ApiServerItem } from "@/api/api-keys";
 
 function groupServerIps(server: ApiServerItem[]) {
   return server.reduce<Record<number, string[]>>((groups, item) => {
