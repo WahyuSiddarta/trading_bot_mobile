@@ -39,6 +39,18 @@ export const apiKeyMock: ApiKeyResponse = {
       exchanger_id: 1,
       ip_addr: "167.172.72.180",
     },
+    {
+      exchanger_id: 1,
+      ip_addr: "167.172.72.181",
+    },
+    {
+      exchanger_id: 1,
+      ip_addr: "167.172.32.180",
+    },
+    {
+      exchanger_id: 2,
+      ip_addr: "167.172.32.180",
+    },
   ],
   status: "OK",
 };
