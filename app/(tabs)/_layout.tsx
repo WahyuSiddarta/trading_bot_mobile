@@ -3,6 +3,7 @@ import {
   ChartCandlestick,
   CircleUserRound,
   House,
+  KeyRound,
   Medal,
   Wallet,
   type LucideIcon,
@@ -85,8 +86,18 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="api-keys"
+          options={{
+            title: "API Keys",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={KeyRound} color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="signals"
           options={{
+            href: null,
             title: "Services",
             tabBarIcon: ({ color, focused }) => (
               <TabIcon

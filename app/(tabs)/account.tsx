@@ -1,4 +1,5 @@
 import * as Clipboard from "expo-clipboard";
+import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
 import {
   Bell,
@@ -38,6 +39,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { useToast } from "@/components/ui/toast";
 import { useAuthStore } from "@/stores/auth-store";
+import { useSecurityStore } from "@/stores/security-store";
 
 const profitResponse = {
   code: "DATA_PROFIT_RETRIEVED",
@@ -98,24 +100,28 @@ const telegramSetting = {
 const securityMenus = [
   {
     title: "Security Email",
-    description: "Manage recovery and login verification email",
+    description:
+      "A confirmation link will be sent to your email for verification.",
     Icon: Mail,
     isActive: true,
-  },
-  {
-    title: "Security PIN",
-    description: "Protect withdrawals and sensitive actions",
-    Icon: LockKeyhole,
-    isActive: false,
+    hasAction: false,
   },
   {
     title: "Change Password",
     description: "Update account login password",
     Icon: KeySquare,
+    route: "/account/change-password",
   },
   {
-    title: "Google Authenticator",
-    description: "Two-factor authentication token setup",
+    title: "Security PIN",
+    description: "A 6-digit PIN to protect your account",
+    Icon: LockKeyhole,
+    isActive: false,
+  },
+
+  {
+    title: "Authenticator",
+    description: "You can use apps like Google Authenticator or Authy.",
     Icon: Fingerprint,
     isActive: false,
   },
@@ -127,9 +133,9 @@ const securityMenus = [
   },
   {
     title: "Biometric",
-    description: "Use device biometrics for faster account unlock",
+    description: "Ask for biometrics when returning to the app",
     Icon: ScanFace,
-    isActive: true,
+    type: "biometric",
   },
 ];
 
@@ -139,9 +145,18 @@ function formatNumber(value: number) {
   }).format(value);
 }
 
-function NotificationButton({ count }: { count: number }) {
+function NotificationButton({
+  count,
+  onPress,
+}: {
+  count: number;
+  onPress: () => void;
+}) {
   return (
-    <Pressable className="relative h-9 w-9 items-center justify-center rounded-md border border-[#F59E0B]/35 bg-[#F59E0B]/10 active:opacity-70">
+    <Pressable
+      className="relative h-9 w-9 items-center justify-center rounded-md border border-[#F59E0B]/35 bg-[#F59E0B]/10 active:opacity-70"
+      onPress={onPress}
+    >
       <Bell size={18} color="#F59E0B" strokeWidth={2.4} />
       <View className="absolute -right-1 -top-1 min-w-5 items-center rounded-full bg-[#F59E0B] px-1 py-0.5">
         <Text className="text-[10px] font-bold text-[#120B03]">{count}</Text>
@@ -281,12 +296,14 @@ function MenuRow({
   Icon,
   isActive,
   onPress,
+  hasAction = true,
 }: {
   title: string;
   description: string;
   Icon: AccountIcon;
   isActive?: boolean;
   onPress?: () => void;
+  hasAction?: boolean;
 }) {
   const StatusIcon = isActive ? CircleCheck : CircleX;
 
@@ -326,7 +343,9 @@ function MenuRow({
           </Text>
         </View>
       ) : null}
-      <ChevronRight size={19} color="#7d93a5" strokeWidth={2.4} />
+      {hasAction ? (
+        <ChevronRight size={19} color="#7d93a5" strokeWidth={2.4} />
+      ) : null}
     </Pressable>
   );
 }
@@ -355,7 +374,17 @@ export default function AccountScreen() {
   const toast = useToast();
   const logout = useAuthStore((state) => state.logout);
   const referralCode = useAuthStore((state) => state.referral) ?? "-";
+  const biometricUnlockEnabled = useSecurityStore(
+    (state) => state.biometricUnlockEnabled,
+  );
+  const setBiometricUnlockEnabled = useSecurityStore(
+    (state) => state.setBiometricUnlockEnabled,
+  );
+  const clearSecuritySettings = useSecurityStore(
+    (state) => state.clearSecuritySettings,
+  );
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isUpdatingBiometric, setIsUpdatingBiometric] = useState(false);
 
   const handleCopyReferralCode = useCallback(async () => {
     await Clipboard.setStringAsync(referralCode);
@@ -370,19 +399,79 @@ export default function AccountScreen() {
     setIsLoggingOut(true);
 
     try {
+      await clearSecuritySettings();
       await logout();
     } catch (error) {
       setIsLoggingOut(false);
       toast.error("Logout failed", "Please try again.");
     }
-  }, [isLoggingOut, logout, toast]);
+  }, [clearSecuritySettings, isLoggingOut, logout, toast]);
+
+  const handleToggleBiometric = useCallback(async () => {
+    if (isUpdatingBiometric) {
+      return;
+    }
+
+    setIsUpdatingBiometric(true);
+
+    try {
+      if (biometricUnlockEnabled) {
+        await setBiometricUnlockEnabled(false);
+        toast.info(
+          "Biometric unlock disabled",
+          "App resume will continue normally.",
+        );
+        return;
+      }
+
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+      if (!hasHardware || !isEnrolled) {
+        toast.error(
+          "Biometric unavailable",
+          "Set up Face ID, Touch ID, or device biometrics first.",
+        );
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        cancelLabel: "Cancel",
+        disableDeviceFallback: false,
+        promptMessage: "Enable biometric app unlock",
+      });
+
+      if (!result.success) {
+        toast.error(
+          "Biometric not enabled",
+          "Authentication was not completed.",
+        );
+        return;
+      }
+
+      await setBiometricUnlockEnabled(true);
+      toast.success(
+        "Biometric unlock enabled",
+        "You will be asked to unlock when returning to the app.",
+      );
+    } catch (error) {
+      toast.error("Biometric update failed", "Please try again.");
+    } finally {
+      setIsUpdatingBiometric(false);
+    }
+  }, [
+    biometricUnlockEnabled,
+    isUpdatingBiometric,
+    setBiometricUnlockEnabled,
+    toast,
+  ]);
 
   return (
     <SafeAreaView className="flex-1 bg-[#0B2D22]" edges={["top"]}>
       <ScrollView
         alwaysBounceVertical
         className="flex-1 bg-background/90"
-        contentContainerStyle={{ paddingBottom: 128 }}
+        contentContainerStyle={{ paddingBottom: 28 }}
         keyboardShouldPersistTaps="handled"
         overScrollMode="always"
         showsVerticalScrollIndicator={false}
@@ -393,7 +482,10 @@ export default function AccountScreen() {
               <Text className="text-xs font-bold uppercase text-white/85">
                 Profile
               </Text>
-              <NotificationButton count={notificationCount} />
+              <NotificationButton
+                count={notificationCount}
+                onPress={() => router.push("/notifications")}
+              />
             </View>
             <View className="items-center mt-6">
               <View className="h-[72px] w-[72px] items-center justify-center rounded-2xl border border-border bg-secondary">
@@ -439,7 +531,7 @@ export default function AccountScreen() {
           </View>
         </Pressable>
 
-        <View className="px-5 mt-5">
+        <View className="px-5 mt-4">
           <SectionTitle Icon={Flame} title="Gas & Wallet" />
 
           <View className="px-4 py-2 border rounded-2xl border-border bg-card">
@@ -461,7 +553,7 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <View className="px-5 mt-5">
+        <View className="px-5 mt-4">
           <SectionTitle
             Icon={Settings}
             accent="#F59E0B"
@@ -485,6 +577,7 @@ export default function AccountScreen() {
               Icon={KeyRound}
               description="Trading API credentials and permissions"
               title="API Key"
+              onPress={() => router.push("/api-keys")}
             />
             <View className="h-px bg-border/70" />
             <MenuRow
@@ -497,12 +590,26 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <View className="px-5 mt-5">
+        <View className="px-5 mt-4">
           <SectionTitle Icon={ShieldCheck} title="Security" />
           <View className="px-4 py-2 border rounded-2xl border-border bg-card">
             {securityMenus.map((item, index) => (
               <View key={item.title}>
-                <MenuRow {...item} />
+                <MenuRow
+                  {...item}
+                  isActive={
+                    item.type === "biometric"
+                      ? biometricUnlockEnabled
+                      : item.isActive
+                  }
+                  onPress={
+                    item.type === "biometric"
+                      ? handleToggleBiometric
+                      : item.route
+                        ? () => router.push(item.route as any)
+                        : undefined
+                  }
+                />
                 {index < securityMenus.length - 1 ? (
                   <View className="h-px bg-border/70" />
                 ) : null}
@@ -511,7 +618,7 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <View className="px-5 mt-5">
+        <View className="px-5 mt-4">
           <Pressable
             className={`flex-row items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 active:opacity-70 ${
               isLoggingOut ? "opacity-60" : ""
