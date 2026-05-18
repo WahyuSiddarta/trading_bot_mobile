@@ -24,8 +24,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { cn } from "@/lib/utils";
 import { Colors } from "@/constants/theme";
+import { cn } from "@/lib/utils";
 
 type ToastVariant = "success" | "error" | "info" | "warning";
 
@@ -43,16 +43,29 @@ type ToastState = Required<Pick<ToastOptions, "title" | "variant">> &
 
 type ToastContextValue = {
   show: (options: ToastOptions) => void;
-  success: (title: string, message?: string, options?: ToastMethodOptions) => void;
-  error: (title: string, message?: string, options?: ToastMethodOptions) => void;
+  success: (
+    title: string,
+    message?: string,
+    options?: ToastMethodOptions,
+  ) => void;
+  error: (
+    title: string,
+    message?: string,
+    options?: ToastMethodOptions,
+  ) => void;
   info: (title: string, message?: string, options?: ToastMethodOptions) => void;
-  warning: (title: string, message?: string, options?: ToastMethodOptions) => void;
+  warning: (
+    title: string,
+    message?: string,
+    options?: ToastMethodOptions,
+  ) => void;
   hide: () => void;
 };
 
 type ToastMethodOptions = Omit<ToastOptions, "title" | "message" | "variant">;
 
 const DEFAULT_DURATION = 3000;
+const DEFAULT_ERROR_DURATION = 10000;
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
@@ -118,7 +131,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, [clearToastTimeout]);
 
   const show = useCallback(
-    ({ title, message, variant = "info", duration = DEFAULT_DURATION }: ToastOptions) => {
+    ({
+      title,
+      message,
+      variant = "info",
+      duration = DEFAULT_DURATION,
+    }: ToastOptions) => {
       clearToastTimeout();
 
       const nextToast = {
@@ -150,7 +168,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       success: (title, message, options) =>
         show({ title, message, variant: "success", ...options }),
       error: (title, message, options) =>
-        show({ title, message, variant: "error", ...options }),
+        show({
+          title,
+          message,
+          variant: "error",
+          duration: DEFAULT_ERROR_DURATION,
+          ...options,
+        }),
       info: (title, message, options) =>
         show({ title, message, variant: "info", ...options }),
       warning: (title, message, options) =>
@@ -234,7 +258,7 @@ function ToastHost({
         )}
       >
         <ToastIcon size={18} color={styles.icon} strokeWidth={2.4} />
-        <View className="min-w-0 flex-1">
+        <View className="flex-1 min-w-0">
           <Text
             className={cn("text-sm font-bold", styles.title)}
             style={styles.titleColor ? { color: styles.titleColor } : undefined}

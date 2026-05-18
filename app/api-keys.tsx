@@ -1,6 +1,6 @@
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import * as Clipboard from "expo-clipboard";
 import { Stack, router } from "expo-router";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import {
   CheckCircle2,
   ChevronLeft,
@@ -9,7 +9,13 @@ import {
   Server,
 } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { ApiKeyItem, ApiServerItem } from "@/api/api-keys";
@@ -41,7 +47,13 @@ type ApiKeySubmitPayload = {
 
 export default function ApiKeysScreen() {
   const toast = useToast();
-  const { data: apiResponse, isLoading } = useApiKeysQuery();
+  const {
+    data: apiResponse,
+    isLoading,
+    isError,
+    refetch,
+    isRefetching,
+  } = useApiKeysQuery();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetSnapPoints = useMemo(() => ["82%"], []);
   const [apiKeys, setApiKeys] = useState<ApiKeyItem[]>([]);
@@ -49,6 +61,8 @@ export default function ApiKeysScreen() {
   const [formMode, setFormMode] = useState<ApiKeyFormMode>("create");
   const [editingItem, setEditingItem] = useState<ApiKeyItem | null>(null);
   const [form, setForm] = useState<ApiKeyFormState>(createEmptyApiKeyForm);
+  // TODO: replace with real API call; toggle to true to simulate a failure
+  const simulateError = true;
 
   useEffect(() => {
     setApiKeys(apiResponse?.data ?? []);
@@ -105,6 +119,16 @@ export default function ApiKeysScreen() {
       payload.api_secret = trimmedSecret;
     }
 
+    if (simulateError) {
+      toast.error(
+        formMode === "create"
+          ? "Failed to create API key"
+          : "Failed to update API key",
+        "Please try again.",
+      );
+      return;
+    }
+
     if (formMode === "create") {
       setApiKeys((current) => [
         ...current,
@@ -137,6 +161,11 @@ export default function ApiKeysScreen() {
   };
 
   const handleDelete = (itemToDelete: ApiKeyItem) => {
+    if (simulateError) {
+      toast.error("Failed to delete API key", "Please try again.");
+      return;
+    }
+
     setApiKeys((current) => current.filter((item) => item !== itemToDelete));
     setEnabledByKey((current) => {
       const next = { ...current };
@@ -152,6 +181,9 @@ export default function ApiKeysScreen() {
       <ScrollView
         contentContainerClassName="gap-4 px-4 pb-24 pt-3"
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+        }
       >
         <View className="gap-3">
           <View className="flex-row items-center justify-between">
@@ -211,6 +243,12 @@ export default function ApiKeysScreen() {
                 Loading server IPs...
               </Text>
             </View>
+          ) : isError ? (
+            <View className="p-3 border rounded-xl border-red-500/30 bg-red-950/40">
+              <Text className="text-xs font-semibold text-red-400">
+                Failed to load server IPs.
+              </Text>
+            </View>
           ) : (
             Object.entries(serverGroups).map(([exchangerId, ipAddresses]) => {
               return (
@@ -237,6 +275,12 @@ export default function ApiKeysScreen() {
             <View className="p-3 border rounded-xl border-border bg-surface">
               <Text className="text-xs font-semibold text-muted-foreground">
                 Loading API keys...
+              </Text>
+            </View>
+          ) : isError ? (
+            <View className="p-3 border rounded-xl border-red-500/30 bg-red-950/40">
+              <Text className="text-xs font-semibold text-red-400">
+                Failed to load API keys.
               </Text>
             </View>
           ) : (
