@@ -5,6 +5,8 @@ import config from "@/config";
 const API_BASE_URL = config.BASE_URL.replace(/\/+$/, "");
 const PRIVATE_API_PREFIX = "/v1";
 const PUBLIC_API_PREFIX = "/public";
+const LOST_API_PREFIX = "/lost";
+const REG_API_PREFIX = "/reg";
 
 const withLeadingSlash = (url: string) =>
   url.startsWith("/") ? url : `/${url}`;
@@ -23,11 +25,33 @@ const stripPrefix = (url: string, prefix: string) => {
 
 const privatePath = (url: string) => stripPrefix(url, PRIVATE_API_PREFIX);
 const publicPath = (url: string) => stripPrefix(url, PUBLIC_API_PREFIX);
-const appError = (status: number | string = 500) => ({
-  status,
-  code: "ERROR_APPS",
-});
+const appError = (status: number | string = 500) => {
+  console.log("App error:", status);
+  return {
+    status,
+    code: "ERROR_APPS",
+  };
+};
 
+const lostApi = axios.create({
+  baseURL: `${API_BASE_URL}${LOST_API_PREFIX}`,
+  headers: {
+    "Accept-encoding": "gzip",
+  },
+});
+const initLostAPI = (token: string) => {
+  lostApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+};
+
+const regApi = axios.create({
+  baseURL: `${API_BASE_URL}${REG_API_PREFIX}`,
+  headers: {
+    "Accept-encoding": "gzip",
+  },
+});
+const initRegAPI = (token: string) => {
+  regApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+};
 /**
  * Private API instance (initialize the base of public API from Axios)
  */
@@ -60,6 +84,27 @@ const publicApi = axios.create({
     "Accept-encoding": "gzip",
   },
 });
+publicApi.interceptors.response.use(
+  function (response) {
+    const url = response.config.url;
+    if (!!response.data?.token) {
+      if (url?.includes("/losttoken")) {
+        initLostAPI(response.data.token);
+      } else if (url?.includes("/token")) {
+        initRegAPI(response.data.token);
+      }
+    }
+
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    return response;
+  },
+  function (error) {
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+    return Promise.reject(error);
+  },
+);
 
 /**
  * The method for setting the private API Authorization
@@ -83,10 +128,17 @@ export const deletePrivateAPI = () => {
  * @returns
  */
 async function postPublic(url: string, param: Record<string, any>) {
-  let data = new URLSearchParams(param);
-
   try {
-    let response = await publicApi.post(publicPath(url), data.toString());
+    console.log(
+      "=== postPublic ===",
+      publicApi.defaults.baseURL + publicPath(url),
+      param,
+    );
+    let response = await publicApi.post(publicPath(url), param, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
     return response?.data;
   } catch (errCatch: any) {
     if (errCatch?.response) {
@@ -117,10 +169,7 @@ async function postPrivate(url: string, param: Record<string, any>) {
       : Promise.reject(appError());
   }
 }
-async function putPrivate(
-  url: string,
-  param: Record<string, any>,
-) {
+async function putPrivate(url: string, param: Record<string, any>) {
   let data = new URLSearchParams(param);
 
   try {
@@ -132,10 +181,7 @@ async function putPrivate(
       : Promise.reject(appError());
   }
 }
-async function deletePrivate(
-  url: string,
-  param: Record<string, any>,
-) {
+async function deletePrivate(url: string, param: Record<string, any>) {
   let data = new URLSearchParams(param);
 
   try {
@@ -225,6 +271,7 @@ async function handleResponse(
   privateRoute = false,
 ) {
   const data = response?.data;
+  console.log("handleResponse ::: ", { status: response?.status, data });
   try {
     const status = response?.status;
     const headers = response?.headers || {};

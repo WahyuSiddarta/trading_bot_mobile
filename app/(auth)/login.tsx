@@ -22,15 +22,15 @@ import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
 import { Button } from "@/components/ui/my-button";
 import { useToast } from "@/components/ui/toast";
+import config from "@/config";
 import { hashPassword } from "@/lib/crypto";
 import { useAuthStore } from "@/stores/auth-store";
+import { errorMessages } from "@/utils/error";
 import { fetchWrapper } from "@/utils/fetcher";
-
-import config from "@/config";
 
 const RECAPTCHA_SITE_KEY = config.RECAPTCHA_KEY;
 const RECAPTCHA_BASE_URL = config.BASE_URL;
-const RECAPTCHA_LOGIN_ACTION = "login";
+const RECAPTCHA_LOGIN_ACTION = "";
 
 const hiddenRecaptchaContainerStyle = {
   position: "absolute",
@@ -41,11 +41,7 @@ const hiddenRecaptchaContainerStyle = {
 } satisfies ViewStyle;
 
 const loginSchema = yup.object({
-  email: yup
-    .string()
-    .trim()
-    .email("Enter a valid email address")
-    .required("Email is required"),
+  email: yup.string().trim().required("Email is required"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -61,35 +57,8 @@ type LoginPayload = {
 };
 
 async function loginApi(payload: LoginPayload) {
+  console.log("Login API called with payload:", payload);
   return fetchWrapper.postPublic("/api/public/login", payload);
-}
-
-function getLoginErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  if (error && typeof error === "object") {
-    const errorData = error as {
-      message?: unknown;
-      error?: unknown;
-      code?: unknown;
-    };
-
-    if (typeof errorData.message === "string") {
-      return errorData.message;
-    }
-
-    if (typeof errorData.error === "string") {
-      return errorData.error;
-    }
-
-    if (typeof errorData.code === "string") {
-      return errorData.code;
-    }
-  }
-
-  return "Please check your credentials and try again.";
 }
 
 function isLoginFieldValid(
@@ -136,7 +105,7 @@ export default function LoginScreen() {
       router.replace("/");
     },
     onError: (error) => {
-      toast.error("Login failed", getLoginErrorMessage(error));
+      toast.error("Login failed", errorMessages(error));
     },
   });
   const isLoginBusy = isPreparingLogin || loginMutation.isPending;
@@ -162,10 +131,7 @@ export default function LoginScreen() {
         captcha,
       });
     } catch (error) {
-      toast.error(
-        "Verification failed",
-        error instanceof Error ? error.message : "Unable to verify login.",
-      );
+      toast.error("Verification failed", errorMessages(error));
     } finally {
       setIsPreparingLogin(false);
     }
