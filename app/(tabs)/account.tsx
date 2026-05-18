@@ -79,7 +79,6 @@ const profitSummary = [
 ];
 
 const profileProfitSummary = profitSummary.slice(0, 3);
-const referralCode = "TBOT-8X4K2";
 const notificationCount = 3;
 const pushNotificationsEnabled = true;
 const appVersion = "v1.0.0";
@@ -211,9 +210,11 @@ function PushNotificationRow({ enabled }: { enabled: boolean }) {
 }
 
 function ReferralRow({
+  referralCode,
   onCopy,
   onPress,
 }: {
+  referralCode: string;
   onCopy: () => void;
   onPress: () => void;
 }) {
@@ -343,12 +344,13 @@ export default function AccountScreen() {
   const router = useRouter();
   const toast = useToast();
   const logout = useAuthStore((state) => state.logout);
+  const referralCode = useAuthStore((state) => state.referral) ?? "-";
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleCopyReferralCode = useCallback(async () => {
     await Clipboard.setStringAsync(referralCode);
     toast.info("Referral code copied", referralCode);
-  }, [toast]);
+  }, [referralCode, toast]);
 
   const handleLogout = useCallback(async () => {
     if (isLoggingOut) {
@@ -461,8 +463,9 @@ export default function AccountScreen() {
             <MenuRow {...telegramSetting} />
             <View className="h-px bg-border/70" />
             <ReferralRow
+              referralCode={referralCode}
               onCopy={handleCopyReferralCode}
-              onPress={() => router.push("/leaderboard")}
+              onPress={() => router.push("/referral")}
             />
             <View className="h-px bg-border/70" />
             <MenuRow

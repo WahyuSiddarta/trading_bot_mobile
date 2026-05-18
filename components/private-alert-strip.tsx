@@ -23,34 +23,55 @@ const alertColors = {
   warningForeground: Colors.dark.warningForeground,
 };
 
-// const alertResponse = {
-//   code: "ALERT_RETRIEVED",
-//   elapsed: 0.123,
-//   engine_alert: [],
-//   general_alert: [],
-//   status: "OK",
-//   version: "v1.0.0",
-// };
-const alertResponse = {
+type EngineAlert = {
+  ip: string;
+  symbol: string;
+  user_id: string;
+};
+
+type GeneralAlert = {
+  alert_type: number;
+  message: string;
+  user_id: string;
+};
+
+type AlertResponse = {
+  code: string;
+  elapsed: number;
+  engine_alert: EngineAlert[];
+  general_alert: GeneralAlert[];
+  status: string;
+  version: string;
+};
+
+const alertResponse: AlertResponse = {
   code: "ALERT_RETRIEVED",
   elapsed: 0.123,
-  engine_alert: [
-    {
-      ip: "203.0.113.10",
-      symbol: "BTCUSDT",
-      user_id: "1d4f2cf6-68af-4c3f-9c8d-71d2e6a45b19",
-    },
-  ],
-  general_alert: [
-    {
-      alert_type: 1,
-      message: "Operation completed successfully",
-      user_id: "1d4f2cf6-68af-4c3f-9c8d-71d2e6a45b19",
-    },
-  ],
+  engine_alert: [],
+  general_alert: [],
   status: "OK",
   version: "v1.0.0",
 };
+// const alertResponse: AlertResponse = {
+//   code: "ALERT_RETRIEVED",
+//   elapsed: 0.123,
+//   engine_alert: [
+//     {
+//       ip: "203.0.113.10",
+//       symbol: "BTCUSDT",
+//       user_id: "1d4f2cf6-68af-4c3f-9c8d-71d2e6a45b19",
+//     },
+//   ],
+//   general_alert: [
+//     {
+//       alert_type: 1,
+//       message: "Operation completed successfully",
+//       user_id: "1d4f2cf6-68af-4c3f-9c8d-71d2e6a45b19",
+//     },
+//   ],
+//   status: "OK",
+//   version: "v1.0.0",
+// };
 
 export function PrivateAlertStrip() {
   const insets = useSafeAreaInsets();

@@ -18,6 +18,7 @@ import { useEffect } from "react";
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { PrivateAlertStrip } from "@/components/private-alert-strip";
 import { ToastProvider } from "@/components/ui/toast";
 import { Colors } from "@/constants/theme";
 import { queryClient } from "@/lib/query-client";
@@ -102,16 +103,22 @@ function RootNavigator() {
     }
   }, [isAuthenticated, isLoading, rootNavigationState?.key, router, segments]);
 
+  const shouldShowPrivateAlertStrip =
+    isAuthenticated && segments[0] !== "(auth)" && segments[0] !== "(tabs)";
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={AppTheme}>
         <ToastProvider>
           <GestureHandlerRootView className="flex-1">
             <BottomSheetModalProvider>
-              <Stack>
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              </Stack>
+              <View className="flex-1 bg-background">
+                {shouldShowPrivateAlertStrip ? <PrivateAlertStrip /> : null}
+                <Stack>
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                </Stack>
+              </View>
               <StatusBar style="auto" />
               <PortalHost />
             </BottomSheetModalProvider>
