@@ -16,15 +16,14 @@ import {
   LockKeyhole,
   LogOut,
   Mail,
-  MessageCircle,
   ScanFace,
   Settings,
   ShieldCheck,
   UserRound,
   UsersRound,
   Wallet,
-  type LucideIcon,
 } from "lucide-react-native";
+import type { ComponentType } from "react";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -36,6 +35,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { useToast } from "@/components/ui/toast";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -83,11 +83,16 @@ const notificationCount = 3;
 const pushNotificationsEnabled = true;
 const appVersion = "v1.0.0";
 
+type AccountIcon = ComponentType<{
+  color?: string;
+  size?: number;
+  strokeWidth?: number;
+}>;
+
 const telegramSetting = {
   title: "Telegram Setting",
   description: "Bot alerts and account notifications",
-  Icon: MessageCircle,
-  isActive: true,
+  Icon: TelegramIcon,
 };
 
 const securityMenus = [
@@ -156,7 +161,7 @@ function BalanceRow({
   subtitle: string;
   value: string;
   actionLabel: string;
-  Icon: LucideIcon;
+  Icon: AccountIcon;
 }) {
   return (
     <View className="flex-row items-center gap-3 py-2">
@@ -257,7 +262,7 @@ function SectionTitle({
   accent = "#22C986",
 }: {
   title: string;
-  Icon: LucideIcon;
+  Icon: AccountIcon;
   accent?: string;
 }) {
   return (
@@ -275,16 +280,21 @@ function MenuRow({
   description,
   Icon,
   isActive,
+  onPress,
 }: {
   title: string;
   description: string;
-  Icon: LucideIcon;
+  Icon: AccountIcon;
   isActive?: boolean;
+  onPress?: () => void;
 }) {
   const StatusIcon = isActive ? CircleCheck : CircleX;
 
   return (
-    <Pressable className="flex-row items-center gap-3 py-2.5 active:opacity-70">
+    <Pressable
+      className="flex-row items-center gap-3 py-2.5 active:opacity-70"
+      onPress={onPress}
+    >
       <View className="items-center justify-center border rounded-md h-9 w-9 border-border bg-secondary">
         <Icon size={18} color="#22C986" strokeWidth={2.3} />
       </View>
@@ -460,7 +470,10 @@ export default function AccountScreen() {
           <View className="px-4 py-2 border rounded-2xl border-border bg-card">
             <PushNotificationRow enabled={pushNotificationsEnabled} />
             <View className="h-px bg-border/70" />
-            <MenuRow {...telegramSetting} />
+            <MenuRow
+              {...telegramSetting}
+              onPress={() => router.push("/telegram")}
+            />
             <View className="h-px bg-border/70" />
             <ReferralRow
               referralCode={referralCode}

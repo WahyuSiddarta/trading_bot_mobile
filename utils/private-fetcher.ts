@@ -6,6 +6,7 @@ const referralResponse = {
 };
 
 const shouldMockReferralError = true;
+const shouldMockTelegramLinkError = false;
 
 export type AuxiliaryValue = string | number | boolean;
 
@@ -19,6 +20,22 @@ export type ReferralNode = {
   label: string;
   auxiliary: Record<string, AuxiliaryValue>[];
   parentId: string | null;
+};
+
+export type TelegramLinkCode = {
+  status: "OK";
+  code: string;
+  telegram_link_code: string;
+  telegram_link_expires_at: string;
+  elapsed: number;
+};
+
+const telegramLinkResponse: TelegramLinkCode = {
+  status: "OK",
+  code: "TELEGRAM_LINK_CODE_RETRIEVED",
+  telegram_link_code: "telelink:LTbifeoi5p8eRJcRIyKTMcy7",
+  telegram_link_expires_at: "2026-05-18T13:46:22.541405Z",
+  elapsed: 0.002379313,
 };
 
 function getMockReferralUsers() {
@@ -42,4 +59,14 @@ export async function fetchReferralUsers() {
   }
 
   return getMockReferralUsers();
+}
+
+export async function fetchTelegramLinkCode() {
+  await new Promise((resolve) => setTimeout(resolve, 700));
+
+  if (shouldMockTelegramLinkError) {
+    return Promise.reject(createMockError());
+  }
+
+  return telegramLinkResponse;
 }
