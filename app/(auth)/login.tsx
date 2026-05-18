@@ -1,10 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
+import ReCaptcha, {
+  GoogleRecaptchaRefAttributes,
+} from "@valture/react-native-recaptcha-v3";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import type { ViewStyle } from "react-native";
 import {
   Keyboard,
   Pressable,
@@ -17,7 +21,24 @@ import * as yup from "yup";
 import { FormPasswordInput } from "@/components/ui/form-password-input";
 import { FormTextInput } from "@/components/ui/form-text-input";
 import { Button } from "@/components/ui/my-button";
+import { useToast } from "@/components/ui/toast";
+import { hashPassword } from "@/lib/crypto";
 import { useAuthStore } from "@/stores/auth-store";
+import { fetchWrapper } from "@/utils/fetcher";
+
+import config from "@/config";
+
+const RECAPTCHA_SITE_KEY = config.RECAPTCHA_KEY;
+const RECAPTCHA_BASE_URL = config.BASE_URL;
+const RECAPTCHA_LOGIN_ACTION = "login";
+
+const hiddenRecaptchaContainerStyle = {
+  position: "absolute",
+  width: 0,
+  height: 0,
+  opacity: 0,
+  zIndex: -1,
+} satisfies ViewStyle;
 
 const loginSchema = yup.object({
   email: yup
@@ -33,6 +54,44 @@ const loginSchema = yup.object({
 
 type LoginFormValues = yup.InferType<typeof loginSchema>;
 
+type LoginPayload = {
+  email: string;
+  password: string;
+  captcha: string;
+};
+
+async function loginApi(payload: LoginPayload) {
+  return fetchWrapper.postPublic("/api/public/login", payload);
+}
+
+function getLoginErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (error && typeof error === "object") {
+    const errorData = error as {
+      message?: unknown;
+      error?: unknown;
+      code?: unknown;
+    };
+
+    if (typeof errorData.message === "string") {
+      return errorData.message;
+    }
+
+    if (typeof errorData.error === "string") {
+      return errorData.error;
+    }
+
+    if (typeof errorData.code === "string") {
+      return errorData.code;
+    }
+  }
+
+  return "Please check your credentials and try again.";
+}
+
 function isLoginFieldValid(
   field: keyof LoginFormValues,
   values: LoginFormValues,
@@ -47,9 +106,12 @@ function isLoginFieldValid(
 
 export default function LoginScreen() {
   const router = useRouter();
+  const toast = useToast();
   const login = useAuthStore((state) => state.login);
 
+  const recaptchaRef = useRef<GoogleRecaptchaRefAttributes>(null);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [isPreparingLogin, setIsPreparingLogin] = useState(false);
 
   const {
     control,
@@ -67,17 +129,46 @@ export default function LoginScreen() {
   const formValues = watch();
 
   const loginMutation = useMutation({
-    mutationFn: async (_values: LoginFormValues) => {
+    mutationFn: loginApi,
+    onSuccess: async (session) => {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      await login();
-    },
-    onSuccess: () => {
+      await login(session);
       router.replace("/");
     },
+    onError: (error) => {
+      toast.error("Login failed", getLoginErrorMessage(error));
+    },
   });
+  const isLoginBusy = isPreparingLogin || loginMutation.isPending;
 
-  const onLogin = handleSubmit((values) => {
-    loginMutation.mutate(values);
+  const onLogin = handleSubmit(async (values) => {
+    setIsPreparingLogin(true);
+
+    try {
+      const captcha = await recaptchaRef.current?.getToken(
+        RECAPTCHA_LOGIN_ACTION,
+      );
+
+      if (!captcha) {
+        toast.error("Verification failed", "Unable to create reCAPTCHA token.");
+        return;
+      }
+
+      const passwordHash = await hashPassword(values.password);
+
+      loginMutation.mutate({
+        email: values.email,
+        password: passwordHash,
+        captcha,
+      });
+    } catch (error) {
+      toast.error(
+        "Verification failed",
+        error instanceof Error ? error.message : "Unable to verify login.",
+      );
+    } finally {
+      setIsPreparingLogin(false);
+    }
   });
 
   return (
@@ -102,6 +193,16 @@ export default function LoginScreen() {
 
           {/* Content */}
           <View className="relative z-10 gap-8">
+            <ReCaptcha
+              ref={recaptchaRef}
+              siteKey={RECAPTCHA_SITE_KEY}
+              baseUrl={RECAPTCHA_BASE_URL}
+              action={RECAPTCHA_LOGIN_ACTION}
+              onError={(error) => toast.error("Verification failed", error)}
+              containerStyle={hiddenRecaptchaContainerStyle}
+              testMode={__DEV__}
+            />
+
             <View className="gap-3">
               <Text className="text-xs font-bold tracking-widest text-green-500 uppercase">
                 Welcome Back
@@ -136,7 +237,7 @@ export default function LoginScreen() {
                       dirtyFields.email &&
                       isLoginFieldValid("email", formValues),
                     )}
-                    editable={!loginMutation.isPending}
+                    editable={!isLoginBusy}
                     autoCapitalize="none"
                     autoComplete="email"
                     keyboardType="email-address"
@@ -167,7 +268,7 @@ export default function LoginScreen() {
                       dirtyFields.password &&
                       isLoginFieldValid("password", formValues),
                     )}
-                    editable={!loginMutation.isPending}
+                    editable={!isLoginBusy}
                     required
                   />
                 )}
@@ -177,7 +278,7 @@ export default function LoginScreen() {
                 title="Login"
                 loadingTitle="Logging in..."
                 onPress={onLogin}
-                loading={loginMutation.isPending}
+                loading={isLoginBusy}
                 className="mt-4"
                 size="lg"
               />
