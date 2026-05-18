@@ -38,6 +38,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { useToast } from "@/components/ui/toast";
+import { useAnnouncementsQuery } from "@/hooks/use-query";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSecurityStore } from "@/stores/security-store";
 
@@ -81,7 +82,6 @@ const profitSummary = [
 ];
 
 const profileProfitSummary = profitSummary.slice(0, 3);
-const notificationCount = 3;
 const pushNotificationsEnabled = true;
 const appVersion = "v1.0.0";
 
@@ -374,6 +374,7 @@ export default function AccountScreen() {
   const toast = useToast();
   const logout = useAuthStore((state) => state.logout);
   const referralCode = useAuthStore((state) => state.referral) ?? "-";
+  const { data: announcements = [] } = useAnnouncementsQuery();
   const biometricUnlockEnabled = useSecurityStore(
     (state) => state.biometricUnlockEnabled,
   );
@@ -385,6 +386,7 @@ export default function AccountScreen() {
   );
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isUpdatingBiometric, setIsUpdatingBiometric] = useState(false);
+  const notificationCount = announcements.length;
 
   const handleCopyReferralCode = useCallback(async () => {
     await Clipboard.setStringAsync(referralCode);
@@ -492,9 +494,6 @@ export default function AccountScreen() {
                 <UserRound size={34} color="#22C986" strokeWidth={2.2} />
               </View>
               <Text className="mt-3 text-xl font-bold text-white">Account</Text>
-              <Text className="mt-1 text-xs leading-4 text-center text-white/80">
-                Manage security, notification, gas balance, and trading access.
-              </Text>
             </View>
           </View>
         </View>
