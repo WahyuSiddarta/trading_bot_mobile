@@ -11,10 +11,10 @@ import { useMemo, useState } from "react";
 import { Image, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useToast } from "@/components/ui/toast";
-import { exchanger_master_data } from "@/constant/exchanger";
-import { useApiKeysQuery } from "@/hooks/use-query";
 import type { ApiKeyItem, ApiServerItem } from "@/api/api-keys";
+import { useToast } from "@/components/ui/toast";
+import { useApiKeysQuery } from "@/hooks/use-query";
+import { getExchanger } from "@/utils/ui";
 
 function groupServerIps(server: ApiServerItem[]) {
   return server.reduce<Record<number, string[]>>((groups, item) => {
@@ -22,12 +22,6 @@ function groupServerIps(server: ApiServerItem[]) {
     groups[item.exchanger_id].push(item.ip_addr);
     return groups;
   }, {});
-}
-
-function getExchanger(exchangerId: number) {
-  return exchanger_master_data.find(
-    (item) => item.exchanger_id === exchangerId,
-  );
 }
 
 export default function ApiKeysScreen() {
