@@ -2,14 +2,19 @@ import WreathIcon from "@/assets/icon/wreath";
 import { AnimatedTabs } from "@/components/ui/animated-tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { leaderboardMock } from "@/mockresponse/leaderboard";
+import {
+  formatProfit,
+  getOrderedPodium,
+  isCurrentUser,
+  type LeaderboardEntry,
+  type PodiumRank,
+} from "@/utils/leaderboard";
 import { LinearGradient } from "expo-linear-gradient";
 import { ChessKing, ChessQueen, Medal } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 
-type LeaderboardEntry = (typeof leaderboardMock.data)[number];
 type LeaderboardPeriod = "daily" | "weekly" | "monthly";
-type PodiumRank = 1 | 2 | 3;
 
 const routes: { key: LeaderboardPeriod; title: string }[] = [
   { key: "daily", title: "Daily" },
@@ -18,10 +23,6 @@ const routes: { key: LeaderboardPeriod; title: string }[] = [
 ];
 
 const leaderboardEntries = leaderboardMock.data;
-const currentUserMock = {
-  user_id: "7e48704f-cf59-483e-b6c2-181f0a8699ea",
-  username: "cobra777",
-};
 const podiumStyles = {
   1: {
     accent: "#F8C847",
@@ -63,20 +64,6 @@ const podiumStyles = {
     text: "text-[#C9784B]",
   },
 } as const;
-
-function formatProfit(profit: number) {
-  const normalizedProfit = Number(profit.toFixed(4));
-
-  if (normalizedProfit === 0) {
-    return "0.0000";
-  }
-
-  return `${normalizedProfit > 0 ? "+" : ""}${normalizedProfit.toFixed(4)}`;
-}
-
-function isCurrentUser(entry: LeaderboardEntry) {
-  return entry.user_id === currentUserMock.user_id;
-}
 
 function ProfitPill({ profit }: { profit: number }) {
   const isPositive = profit > 0;
@@ -333,17 +320,7 @@ export function LeaderboardList() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const topThree = leaderboardEntries.slice(0, 3);
-  const [firstPlace, secondPlace, thirdPlace] = topThree;
-  const orderedPodium = [
-    secondPlace && { entry: secondPlace, rank: 2 as const },
-    firstPlace && { entry: firstPlace, rank: 1 as const, featured: true },
-    thirdPlace && { entry: thirdPlace, rank: 3 as const },
-  ].filter(Boolean) as {
-    entry: LeaderboardEntry;
-    featured?: boolean;
-    rank: PodiumRank;
-  }[];
+  const orderedPodium = getOrderedPodium(leaderboardEntries);
 
   const simulateFetch = useCallback((showRefreshIndicator = false) => {
     if (loadingTimerRef.current) {

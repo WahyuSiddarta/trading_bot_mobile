@@ -23,75 +23,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useToast } from "@/components/ui/toast";
 import {
-  type AuxiliaryValue,
   type ReferralNode,
   useReferralQuery,
 } from "@/hooks/use-query";
 import { useAuthStore } from "@/stores/auth-store";
 import { errorMessages } from "@/utils/error";
-
-type ReferralMeta = {
-  activated: boolean;
-};
-
-type AuxiliaryEntry = {
-  key: string;
-  value: AuxiliaryValue;
-};
-
-function getAuxiliaryMap(auxiliary: ReferralNode["auxiliary"]) {
-  return auxiliary.reduce<Record<string, AuxiliaryValue>>(
-    (result, item) => ({ ...result, ...item }),
-    {},
-  );
-}
-
-function getAuxiliaryEntries(auxiliary: ReferralNode["auxiliary"]) {
-  return Object.entries(getAuxiliaryMap(auxiliary)).map(([key, value]) => ({
-    key,
-    value,
-  }));
-}
-
-function parseAuxiliary(auxiliary: ReferralNode["auxiliary"]): ReferralMeta {
-  const mergedAuxiliary = getAuxiliaryMap(auxiliary);
-
-  return {
-    activated: Boolean(mergedAuxiliary.activated),
-  };
-}
-
-function formatAuxiliaryLabel(key: string) {
-  return key
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function isNumericLike(value: string) {
-  return value.trim() !== "" && Number.isFinite(Number(value));
-}
-
-function formatNumberValue(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 5,
-  }).format(value);
-}
-
-function formatAuxiliaryValue(value: AuxiliaryValue) {
-  if (typeof value === "boolean") {
-    return value ? "Yes" : "No";
-  }
-
-  if (typeof value === "number") {
-    return formatNumberValue(value);
-  }
-
-  if (isNumericLike(value)) {
-    return formatNumberValue(Number(value));
-  }
-
-  return value;
-}
+import {
+  formatAuxiliaryLabel,
+  formatAuxiliaryValue,
+  getAuxiliaryEntries,
+  parseAuxiliary,
+} from "@/utils/referral";
 
 function StatTile({
   label,
