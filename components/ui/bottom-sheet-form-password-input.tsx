@@ -1,6 +1,6 @@
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { Eye, EyeClosed } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -23,6 +23,7 @@ interface BottomSheetFormPasswordInputProps {
   error?: string;
   isValid?: boolean;
   editable?: boolean;
+  append?: ReactNode;
 }
 
 export function BottomSheetFormPasswordInput({
@@ -37,6 +38,7 @@ export function BottomSheetFormPasswordInput({
   error,
   isValid = false,
   editable = true,
+  append,
 }: BottomSheetFormPasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -135,6 +137,7 @@ export function BottomSheetFormPasswordInput({
           editable={editable}
           autoCapitalize="none"
         />
+        {append && <View className="ml-2">{append}</View>}
         <Pressable
           onPress={() => setShowPassword(!showPassword)}
           disabled={!editable}

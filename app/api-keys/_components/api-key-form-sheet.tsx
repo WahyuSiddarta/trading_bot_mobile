@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as Clipboard from "expo-clipboard";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -8,7 +9,7 @@ import {
 import { BottomSheetFormPasswordInput } from "@/components/ui/bottom-sheet-form-password-input";
 import { BottomSheetFormTextInput } from "@/components/ui/bottom-sheet-form-text-input";
 import { exchanger_master_data } from "@/constant/exchanger";
-import { CheckCircle2, X } from "lucide-react-native";
+import { CheckCircle2, ClipboardPaste, X } from "lucide-react-native";
 import { RefObject, useCallback, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -45,6 +46,20 @@ export const createEmptyApiKeyForm = (): ApiKeyFormState => ({
   apiKey: "",
   apiSecret: "",
 });
+
+function PasteButton({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityLabel="Paste"
+      accessibilityRole="button"
+      hitSlop={8}
+      onPress={onPress}
+      className="items-center justify-center w-9 h-9 rounded-full bg-slate-800/80 active:bg-slate-700"
+    >
+      <ClipboardPaste size={17} color="#22C986" strokeWidth={2.4} />
+    </Pressable>
+  );
+}
 
 const createApiKeySchema = yup.object({
   exchangerId: yup
@@ -94,6 +109,16 @@ export function ApiKeyFormSheet({
   const submitForm = handleSubmit((values) => {
     onSubmit(values);
   });
+
+  const pasteField = async (fieldName: "apiKey" | "apiSecret") => {
+    const clipboardValue = await Clipboard.getStringAsync();
+
+    setValue(fieldName, clipboardValue, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  };
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -234,6 +259,7 @@ export function ApiKeyFormSheet({
             name="apiKey"
             render={({ field: { onBlur, onChange: onFieldChange, value } }) => (
               <BottomSheetFormTextInput
+                append={<PasteButton onPress={() => pasteField("apiKey")} />}
                 autoCapitalize="none"
                 error={errors.apiKey?.message}
                 isValid={Boolean(value) && !errors.apiKey}
@@ -252,6 +278,7 @@ export function ApiKeyFormSheet({
             name="apiSecret"
             render={({ field: { onBlur, onChange: onFieldChange, value } }) => (
               <BottomSheetFormPasswordInput
+                append={<PasteButton onPress={() => pasteField("apiSecret")} />}
                 error={errors.apiSecret?.message}
                 isValid={Boolean(value) && !errors.apiSecret}
                 label="API Secret"
